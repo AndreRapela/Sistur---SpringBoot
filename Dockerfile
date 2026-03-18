@@ -12,5 +12,5 @@ COPY --from=build /app/target/sistur-0.0.1-SNAPSHOT.jar app.jar
 # Expõe a porta que o Render vai usar
 EXPOSE 8080
 
-# Comando para iniciar a aplicação mapeando a porta do Render
-ENTRYPOINT ["java", "-jar", "app.jar", "--server.port=${PORT:8080}"]
+# Comando para iniciar a aplicação mapeando a porta do Render e preferindo IPv4
+ENTRYPOINT ["java", "-Djava.net.preferIPv4Stack=true", "-jar", "app.jar", "--server.port=${PORT:8080}"]
