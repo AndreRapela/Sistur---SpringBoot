@@ -27,6 +27,8 @@ public class Tour {
 
     private String photoUrl;
 
+    private String contactNumber;
+
     private BigDecimal price;
 
     private String partnership; // Nome do parceiro cadastrado

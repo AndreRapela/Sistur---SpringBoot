@@ -27,6 +27,9 @@ public class User {
     private String name;
 
     private String photoUrl;
+    
+    @Column(length = 500)
+    private String bio;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)

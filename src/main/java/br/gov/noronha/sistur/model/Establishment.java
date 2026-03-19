@@ -37,6 +37,8 @@ public class Establishment {
 
     private String photoUrl;
 
+    private String contactNumber;
+
     private String instagramUrl;
 
     private String websiteUrl;

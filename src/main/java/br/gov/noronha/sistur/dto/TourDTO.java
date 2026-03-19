@@ -10,6 +10,7 @@ public record TourDTO(
     String photoUrl,
     BigDecimal price,
     String partnership,
+    String contactNumber,
     BigDecimal latitude,
     BigDecimal longitude
 ) {}

@@ -16,6 +16,7 @@ public record EstablishmentDTO(
     String instagramUrl,
     String websiteUrl,
     String openingHours,
+    String contactNumber,
     String amenities,
     BigDecimal latitude,
     BigDecimal longitude

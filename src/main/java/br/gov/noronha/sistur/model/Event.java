@@ -31,6 +31,8 @@ public class Event {
 
     private String photoUrl;
 
+    private String contactNumber;
+
     private String category; // Musical, Cultural, Profissional, Ambiental
 
     private String externalBookingUrl;

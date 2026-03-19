@@ -30,6 +30,7 @@ public class TourService {
             tour.getPhotoUrl(),
             tour.getPrice(),
             tour.getPartnership(),
+            tour.getContactNumber(),
             tour.getLatitude(),
             tour.getLongitude()
         );

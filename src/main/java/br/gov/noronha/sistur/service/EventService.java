@@ -36,6 +36,7 @@ public class EventService {
             event.getPhotoUrl(),
             event.getCategory(),
             event.getExternalBookingUrl(),
+            event.getContactNumber(),
             event.getLatitude(),
             event.getLongitude()
         );

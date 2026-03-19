@@ -28,8 +28,8 @@ public class EstablishmentService {
             e.getId(), e.getName(), e.getDescription(), e.getType(),
             e.getFoodType(), e.getAveragePrice(), e.getRating(),
             e.getLocation(), e.getPhotoUrl(), e.getInstagramUrl(),
-            e.getWebsiteUrl(), e.getOpeningHours(), e.getAmenities(),
-            e.getLatitude(), e.getLongitude()
+            e.getWebsiteUrl(), e.getOpeningHours(), e.getContactNumber(),
+            e.getAmenities(), e.getLatitude(), e.getLongitude()
         );
     }
     public Page<EstablishmentDTO> findByType(EstablishmentType type, Pageable pageable) {

@@ -11,6 +11,7 @@ public record EventDTO(
     String photoUrl,
     String category,
     String externalBookingUrl,
+    String contactNumber,
     java.math.BigDecimal latitude,
     java.math.BigDecimal longitude
 ) {}
