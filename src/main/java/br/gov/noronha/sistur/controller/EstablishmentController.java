@@ -27,6 +27,12 @@ public class EstablishmentController {
         return ResponseEntity.ok(ApiResponse.success(ests, "Estabelecimentos recuperados com sucesso"));
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<ApiResponse<EstablishmentDTO>> getById(@PathVariable Long id) {
+        EstablishmentDTO est = establishmentService.findById(id);
+        return ResponseEntity.ok(ApiResponse.success(est, "Estabelecimento recuperado com sucesso"));
+    }
+
     @GetMapping("/type/{type}")
     public ResponseEntity<Page<EstablishmentDTO>> getByType(@PathVariable EstablishmentType type, Pageable pageable) {
         return ResponseEntity.ok(establishmentService.findByType(type, pageable));

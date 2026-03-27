@@ -25,6 +25,12 @@ public class EventController {
         return ResponseEntity.ok(ApiResponse.success(events, "Eventos recuperados com sucesso"));
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<ApiResponse<EventDTO>> getById(@PathVariable Long id) {
+        EventDTO event = eventService.findById(id);
+        return ResponseEntity.ok(ApiResponse.success(event, "Evento recuperado com sucesso"));
+    }
+
     @GetMapping("/upcoming")
     public ResponseEntity<Page<EventDTO>> getUpcoming(Pageable pageable) {
         return ResponseEntity.ok(eventService.findUpcoming(pageable));

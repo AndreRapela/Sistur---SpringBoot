@@ -25,6 +25,12 @@ public class TourController {
         return ResponseEntity.ok(ApiResponse.success(tours, "Passeios recuperados com sucesso"));
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<ApiResponse<TourDTO>> getById(@PathVariable Long id) {
+        TourDTO tour = tourService.findById(id);
+        return ResponseEntity.ok(ApiResponse.success(tour, "Passeio recuperado com sucesso"));
+    }
+
     @GetMapping("/category/{category}")
     public ResponseEntity<Page<TourDTO>> getByCategory(@PathVariable String category, Pageable pageable) {
         return ResponseEntity.ok(tourService.findByCategory(category, pageable));

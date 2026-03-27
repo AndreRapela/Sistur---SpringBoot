@@ -4,6 +4,7 @@ import br.gov.noronha.sistur.dto.TourDTO;
 import br.gov.noronha.sistur.model.Tour;
 import br.gov.noronha.sistur.repository.TourRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -35,6 +36,14 @@ public class TourService {
             tour.getLongitude()
         );
     }
+
+    @Cacheable(value = "tours", key = "#id")
+    public TourDTO findById(Long id) {
+        return tourRepository.findById(id)
+            .map(this::toDTO)
+            .orElseThrow(() -> new RuntimeException("Passeio não encontrado"));
+    }
+
     public Page<TourDTO> findByCategory(String category, Pageable pageable) {
         return tourRepository.findByCategory(category, pageable).map(this::toDTO);
     }

@@ -6,6 +6,7 @@ import br.gov.noronha.sistur.dto.LoginRequestDTO;
 import br.gov.noronha.sistur.dto.LoginResponseDTO;
 import br.gov.noronha.sistur.model.User;
 import br.gov.noronha.sistur.repository.UserRepository;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -24,7 +25,7 @@ public class AuthController {
     private String googleClientId;
 
     @PostMapping("/login")
-    public ResponseEntity<ApiResponse<LoginResponseDTO>> login(@RequestBody LoginRequestDTO data) {
+    public ResponseEntity<ApiResponse<LoginResponseDTO>> login(@Valid @RequestBody LoginRequestDTO data) {
         User user = userRepository.findByEmail(data.email())
                 .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
 
@@ -38,7 +39,7 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<ApiResponse<LoginResponseDTO>> register(@RequestBody br.gov.noronha.sistur.dto.RegisterRequestDTO data) {
+    public ResponseEntity<ApiResponse<LoginResponseDTO>> register(@Valid @RequestBody br.gov.noronha.sistur.dto.RegisterRequestDTO data) {
         if (userRepository.findByEmail(data.email()).isPresent()) {
             return ResponseEntity.status(400).body(ApiResponse.error("E-mail já cadastrado"));
         }

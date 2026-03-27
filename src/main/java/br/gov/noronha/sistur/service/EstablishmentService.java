@@ -5,6 +5,7 @@ import br.gov.noronha.sistur.model.Establishment;
 import br.gov.noronha.sistur.model.EstablishmentType;
 import br.gov.noronha.sistur.repository.EstablishmentRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -32,6 +33,14 @@ public class EstablishmentService {
             e.getAmenities(), e.getLatitude(), e.getLongitude()
         );
     }
+
+    @Cacheable(value = "establishments", key = "#id")
+    public EstablishmentDTO findById(Long id) {
+        return establishmentRepository.findById(id)
+            .map(this::toDTO)
+            .orElseThrow(() -> new RuntimeException("Estabelecimento não encontrado"));
+    }
+
     public Page<EstablishmentDTO> findByType(EstablishmentType type, Pageable pageable) {
         return establishmentRepository.findByType(type, pageable).map(this::toDTO);
     }

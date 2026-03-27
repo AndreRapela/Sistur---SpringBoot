@@ -33,6 +33,13 @@ public class Itinerary {
     @Column(nullable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
 
+    @Column(unique = true)
+    private String shareToken;
+
+    @Builder.Default
+    @Column(nullable = false)
+    private int views = 0;
+
     @OneToMany(mappedBy = "itinerary", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ItineraryItem> items;
 }
