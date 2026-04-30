@@ -1,6 +1,6 @@
 package br.gov.noronha.sistur.dto;
 
-import br.gov.noronha.sistur.model.UserRole;
+import br.gov.noronha.sistur.modules.auth.model.UserRole;
 
 public record UserDTO(
     Long id,
@@ -8,5 +8,6 @@ public record UserDTO(
     String email,
     String photoUrl,
     String bio,
-    UserRole role
+    UserRole role,
+    Long ownedEstablishmentId
 ) {}

@@ -12,8 +12,31 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiResponse<Object>> handleGeneralException(Exception ex) {
+        // Em produção, não expor stacktrace
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(ApiResponse.error("Ocorreu um erro interno: " + ex.getMessage()));
+                .body(ApiResponse.error("Erro interno no servidor. Por favor, tente novamente mais tarde."));
+    }
+
+    @ExceptionHandler(RuntimeException.class)
+    public ResponseEntity<ApiResponse<Object>> handleRuntimeException(RuntimeException ex) {
+        String message = ex.getMessage();
+
+        if (message == null || message.isBlank()) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(ApiResponse.error("Erro interno no servidor. Por favor, tente novamente mais tarde."));
+        }
+
+        String normalized = message.toLowerCase(Locale.ROOT);
+        HttpStatus status = HttpStatus.BAD_REQUEST;
+
+        if (normalized.contains("not found") || normalized.contains("não encontrado") || normalized.contains("não encontrada")) {
+            status = HttpStatus.NOT_FOUND;
+        } else if (normalized.contains("permission denied") || normalized.contains("sem permissão") || normalized.contains("acesso negado")) {
+            status = HttpStatus.FORBIDDEN;
+        }
+
+        return ResponseEntity.status(status)
+                .body(ApiResponse.error(message));
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
@@ -30,7 +53,12 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(NoSuchElementException.class)
     public ResponseEntity<ApiResponse<Object>> handleNotFoundException(NoSuchElementException ex) {
+        String message = ex.getMessage();
+        if (message == null || message.isBlank()) {
+            message = "Recurso não encontrado.";
+        }
+
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                .body(ApiResponse.error("Recurso não encontrado."));
+                .body(ApiResponse.error(message));
     }
 }

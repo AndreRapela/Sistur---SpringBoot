@@ -1,6 +1,6 @@
 package br.gov.noronha.sistur.dto;
 
-import br.gov.noronha.sistur.model.EstablishmentType;
+import br.gov.noronha.sistur.modules.tourism.model.EstablishmentType;
 import java.math.BigDecimal;
 
 public record EstablishmentDTO(
@@ -18,6 +18,9 @@ public record EstablishmentDTO(
     String openingHours,
     String contactNumber,
     String amenities,
+    String discountDescription,
+    String discountHours,
+    Boolean isPremiumExclusive,
     BigDecimal latitude,
     BigDecimal longitude
 ) {}

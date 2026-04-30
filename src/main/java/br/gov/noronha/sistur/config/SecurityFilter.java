@@ -1,7 +1,8 @@
 package br.gov.noronha.sistur.config;
 
-import br.gov.noronha.sistur.model.User;
-import br.gov.noronha.sistur.repository.UserRepository;
+import br.gov.noronha.sistur.modules.auth.model.User;
+import br.gov.noronha.sistur.modules.auth.repository.UserRepository;
+import br.gov.noronha.sistur.modules.auth.service.TokenService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

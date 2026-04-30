@@ -1,6 +1,6 @@
 package br.gov.noronha.sistur.dto;
 
-import br.gov.noronha.sistur.model.ItineraryComment;
+import br.gov.noronha.sistur.modules.social.model.ItineraryComment;
 import java.time.LocalDateTime;
 
 public record ItineraryCommentDTO(

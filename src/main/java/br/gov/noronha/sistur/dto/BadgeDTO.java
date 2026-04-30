@@ -1,7 +1,7 @@
 package br.gov.noronha.sistur.dto;
 
-import br.gov.noronha.sistur.model.Badge;
-import br.gov.noronha.sistur.model.UserBadge;
+import br.gov.noronha.sistur.modules.gamification.model.Badge;
+import br.gov.noronha.sistur.modules.gamification.model.UserBadge;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

@@ -1,5 +1,6 @@
 package br.gov.noronha.sistur.dto;
 
+import br.gov.noronha.sistur.modules.auth.model.UserRole;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -14,5 +15,7 @@ public record RegisterRequestDTO(
     
     @NotBlank(message = "A senha é obrigatória")
     @Size(min = 6, message = "A senha deve ter no mínimo 6 caracteres")
-    String password
+    String password,
+
+    UserRole role
 ) {}

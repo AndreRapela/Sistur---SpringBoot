@@ -1,6 +1,7 @@
 package br.gov.noronha.sistur.dto;
 
-import br.gov.noronha.sistur.model.Itinerary;
+import br.gov.noronha.sistur.modules.social.model.Itinerary;
+import br.gov.noronha.sistur.modules.social.model.ItineraryItem;
 import lombok.Builder;
 import lombok.Data;
 import java.time.LocalDateTime;
@@ -12,6 +13,7 @@ public class ItineraryFeedDTO {
     private String name;
     private String userName;
     private String userPhoto;
+    private String shareToken;
     private LocalDateTime createdAt;
     private int views;
     private long likes;
@@ -23,7 +25,10 @@ public class ItineraryFeedDTO {
     public static ItineraryFeedDTO fromEntity(Itinerary itinerary, long likes, long commentsCount, boolean userLiked) {
         String coverImage = null;
         if (itinerary.getItems() != null && !itinerary.getItems().isEmpty()) {
-            coverImage = itinerary.getItems().get(0).getImage();
+            coverImage = itinerary.getItems().stream()
+                    .findFirst()
+                    .map(ItineraryItem::getImage)
+                    .orElse(null);
         }
 
         return ItineraryFeedDTO.builder()
@@ -31,6 +36,7 @@ public class ItineraryFeedDTO {
                 .name(itinerary.getName())
                 .userName(itinerary.getUser().getName())
                 .userPhoto(itinerary.getUser().getPhotoUrl())
+                .shareToken(itinerary.getShareToken())
                 .createdAt(itinerary.getCreatedAt())
                 .views(itinerary.getViews())
                 .likes(likes)
