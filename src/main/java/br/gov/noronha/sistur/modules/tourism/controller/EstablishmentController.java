@@ -21,7 +21,6 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/establishments")
 @RequiredArgsConstructor
-@CrossOrigin(origins = "*")
 public class EstablishmentController {
 
     private final EstablishmentService establishmentService;

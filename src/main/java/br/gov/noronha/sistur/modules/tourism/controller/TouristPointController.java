@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/tourist-points")
 @RequiredArgsConstructor
-@CrossOrigin(origins = "*")
 public class TouristPointController {
 
     private final TouristPointService touristPointService;

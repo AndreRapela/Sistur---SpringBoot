@@ -1,6 +1,5 @@
 package br.gov.noronha.sistur.modules.auth.controller;
 
-import br.gov.noronha.sistur.modules.auth.service.AuthService;
 import br.gov.noronha.sistur.dto.ApiResponse;
 import br.gov.noronha.sistur.dto.LoginRequestDTO;
 import br.gov.noronha.sistur.dto.LoginResponseDTO;
@@ -16,8 +15,8 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
-@CrossOrigin(origins = "*")
 public class AuthController {
+    private static final com.fasterxml.jackson.databind.ObjectMapper JSON_MAPPER = new com.fasterxml.jackson.databind.ObjectMapper();
 
     private final UserRepository userRepository;
     private final TokenService tokenService;
@@ -49,7 +48,7 @@ public class AuthController {
         user.setEmail(data.email());
         user.setName(data.name());
         user.setPassword(passwordEncoder.encode(data.password()));
-        user.setRole(resolveRegisterRole(data.role()));
+        user.setRole(resolveRegisterRole());
         
         userRepository.save(user);
 
@@ -61,9 +60,14 @@ public class AuthController {
     @PostMapping("/google")
     public ResponseEntity<ApiResponse<LoginResponseDTO>> googleLogin(@RequestBody String idTokenBody) {
         try {
-            // O frontend muitas vezes manda o token como string pura ou em um JSON
-            String idToken = idTokenBody.contains(":") ? 
-                idTokenBody.split(":")[1].replaceAll("[\"{}]", "").trim() : idTokenBody;
+            if (googleClientId == null || googleClientId.isBlank()) {
+                return ResponseEntity.status(503).body(ApiResponse.error("Login Google nao configurado"));
+            }
+
+            String idToken = extractGoogleIdToken(idTokenBody);
+            if (idToken.isBlank()) {
+                return ResponseEntity.status(400).body(ApiResponse.error("Token do Google ausente"));
+            }
 
             com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier verifier = 
                 new com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier.Builder(
@@ -85,7 +89,7 @@ public class AuthController {
                     newUser.setName(name);
                     newUser.setPhotoUrl(pictureUrl);
                     newUser.setRole(br.gov.noronha.sistur.modules.auth.model.UserRole.FREE_TOURIST);
-                    newUser.setPassword(java.util.UUID.randomUUID().toString()); // Senha aleatória para social login
+                    newUser.setPassword(passwordEncoder.encode(java.util.UUID.randomUUID().toString()));
                     return userRepository.save(newUser);
                 });
 
@@ -94,16 +98,36 @@ public class AuthController {
                 return ResponseEntity.ok(ApiResponse.success(response, "Login Google realizado com sucesso"));
             }
         } catch (Exception e) {
-            return ResponseEntity.status(401).body(ApiResponse.error("Erro na autenticação do Google: " + e.getMessage()));
+            return ResponseEntity.status(401).body(ApiResponse.error("Erro na autenticacao do Google"));
         }
-        return ResponseEntity.status(401).body(ApiResponse.error("Token do Google inválido"));
+        return ResponseEntity.status(401).body(ApiResponse.error("Token do Google invalido"));
     }
 
-    private UserRole resolveRegisterRole(UserRole requestedRole) {
-        if (requestedRole == UserRole.PRO_TOURIST || requestedRole == UserRole.PREMIUM_TOURIST) {
-            return requestedRole;
+    private String extractGoogleIdToken(String idTokenBody) throws com.fasterxml.jackson.core.JsonProcessingException {
+        if (idTokenBody == null) {
+            return "";
         }
 
+        String body = idTokenBody.trim();
+        if (body.startsWith("{")) {
+            com.fasterxml.jackson.databind.JsonNode node = JSON_MAPPER.readTree(body);
+            for (String field : java.util.List.of("credential", "idToken", "token")) {
+                String value = node.path(field).asText("");
+                if (!value.isBlank()) {
+                    return value.trim();
+                }
+            }
+            return "";
+        }
+
+        if (body.startsWith("\"") && body.endsWith("\"")) {
+            return body.substring(1, body.length() - 1).trim();
+        }
+
+        return body;
+    }
+
+    private UserRole resolveRegisterRole() {
         return UserRole.FREE_TOURIST;
     }
 }

@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/tours")
 @RequiredArgsConstructor
-@CrossOrigin(origins = "*")
 public class TourController {
 
     private final TourService tourService;
