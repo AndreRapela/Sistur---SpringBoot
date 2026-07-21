@@ -19,7 +19,7 @@ public class RouteService {
     private static final double DRIVING_SPEED_METERS_PER_SECOND = 10.0;
     private static final long FALLBACK_SEGMENT_METERS = 1_500L;
 
-    // Mantem a API local previsivel enquanto substitui o mock por uma aproximacao geometricamente consistente.
+    // Mantem a API local previsivel com uma aproximacao geometricamente consistente.
     public RouteResponseDTO calculateRoute(RouteRequestDTO request) {
         if (request == null || request.getWaypoints() == null || request.getWaypoints().isEmpty()) {
             return emptyRoute();

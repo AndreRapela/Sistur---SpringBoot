@@ -52,7 +52,6 @@ public class EventService {
         );
     }
 
-    @Cacheable(value = "events", key = "#id")
     public EventDTO findById(Long id, Authentication authentication) {
         log.info("Buscando evento por ID: {}", id);
         EventDTO eventDTO = eventRepository.findById(id)

@@ -5,5 +5,10 @@ public enum EstablishmentType {
     BAR,
     HOTEL,
     POUSADA,
-    RESORT
+    RESORT,
+    CONVENIENCE,
+    GAS_STATION,
+    MARKET,
+    FAIR,
+    PHARMACY
 }

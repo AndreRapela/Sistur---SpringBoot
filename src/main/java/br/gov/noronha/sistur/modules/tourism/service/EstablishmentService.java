@@ -15,13 +15,13 @@ import br.gov.noronha.sistur.modules.tourism.repository.EstablishmentReviewRepos
 import br.gov.noronha.sistur.repository.specification.EstablishmentSpecifications;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Arrays;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -59,7 +59,6 @@ public class EstablishmentService {
         );
     }
 
-    @Cacheable(value = "establishments", key = "#id")
     public EstablishmentDTO findById(Long id, Authentication authentication) {
         Establishment establishment = establishmentRepository.findById(id)
             .orElseThrow(() -> new RuntimeException("Estabelecimento não encontrado"));
@@ -168,6 +167,17 @@ public class EstablishmentService {
 
     public Page<EstablishmentDTO> findByType(EstablishmentType type, Pageable pageable) {
         return establishmentRepository.findByType(type, pageable).map(this::toDTO);
+    }
+
+    public List<EstablishmentDTO> findByTypes(List<EstablishmentType> types) {
+        List<EstablishmentType> typesToLoad = (types == null || types.isEmpty())
+            ? Arrays.asList(EstablishmentType.values())
+            : types;
+
+        return establishmentRepository.findByTypeInOrderByNameAsc(typesToLoad)
+            .stream()
+            .map(this::toDTO)
+            .collect(Collectors.toList());
     }
 
     private Long resolveUserId(Authentication authentication) {

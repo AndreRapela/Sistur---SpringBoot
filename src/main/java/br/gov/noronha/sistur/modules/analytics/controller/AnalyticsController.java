@@ -1,5 +1,6 @@
 package br.gov.noronha.sistur.modules.analytics.controller;
 
+import br.gov.noronha.sistur.dto.AdminAnalyticsDTO;
 import br.gov.noronha.sistur.dto.AdminStatsDTO;
 import br.gov.noronha.sistur.dto.ApiResponse;
 import br.gov.noronha.sistur.dto.EstablishmentStatsDTO;
@@ -23,6 +24,12 @@ public class AnalyticsController {
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<AdminStatsDTO>> getStats() {
         return ResponseEntity.ok(ApiResponse.success(analyticsService.getGlobalStats(), "Métricas recuperadas"));
+    }
+
+    @GetMapping("/overview")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<ApiResponse<AdminAnalyticsDTO>> getAnalyticsOverview() {
+        return ResponseEntity.ok(ApiResponse.success(analyticsService.getAdminAnalytics(), "Metricas analiticas recuperadas"));
     }
 
     @GetMapping("/establishments/{id}")

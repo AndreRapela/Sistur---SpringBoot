@@ -5,7 +5,15 @@ import lombok.*;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "access_logs")
+@Table(
+    name = "access_logs",
+    indexes = {
+        @Index(name = "idx_access_logs_timestamp", columnList = "timestamp"),
+        @Index(name = "idx_access_logs_action_timestamp", columnList = "actionType,timestamp"),
+        @Index(name = "idx_access_logs_target_action", columnList = "targetType,targetId,actionType"),
+        @Index(name = "idx_access_logs_user_timestamp", columnList = "userId,timestamp")
+    }
+)
 @Getter
 @Setter
 @NoArgsConstructor
@@ -23,6 +31,8 @@ public class AccessLog {
     private String targetType; // 'ESTABLISHMENT', 'PAGE', 'EVENT'
 
     private Long targetId;
+
+    private String targetLabel;
 
     @Column(nullable = false)
     private String actionType;

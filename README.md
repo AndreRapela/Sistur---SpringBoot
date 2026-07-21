@@ -1,65 +1,46 @@
-# ⚙️ SisTur - Backend (Spring Boot 3)
+# SisTur Backend
 
-[![Spring Boot](https://img.shields.io/badge/Spring%20Boot%203-6DB33F?style=for-the-badge&logo=springboot&logoColor=white)](https://spring.io/)
-[![Java](https://img.shields.io/badge/Java%2022-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white)](https://www.oracle.com/java/)
-[![Security](https://img.shields.io/badge/JWT-Security-black?style=for-the-badge&logo=jsonwebtokens&logoColor=white)](https://jwt.io/)
+API Spring Boot do SisTur para turismo em Fernando de Noronha.
 
-> O motor de inteligência e segurança do SisTur, construído sobre uma arquitetura robusta e escalável em Spring Boot e PostgreSQL.
+## Requisitos
 
----
+- JDK 21
+- Maven 3.9+ ou Docker
+- Banco Postgres/Supabase ativo
 
-## 🚀 Funcionalidades Principais
+## Variaveis obrigatorias
 
-- **Segurança Robusta**: Autenticação via JWT (Stateless) com RBAC (Role-Based Access Control).
-- **Gestão de Turismo**: APIs completas para Restaurantes, Hotéis e Eventos locais.
-- **Integração Supabase**: Banco de Dados PostgreSQL hospedado para máxima confiabilidade.
-- **Tratamento Global de Erros**: Respostas Padronizadas e Toast-friendly para o frontend.
-- **Documentação Interativa**: Swagger UI para testes rápidos e documentação técnica.
+Configure no ambiente antes de iniciar:
 
----
-
-## 🛠️ Stack Tecnológica
-
-- **Java 22**: Aproveitando as últimas melhorias da linguagem.
-- **Spring Framework**:
-    - Spring Data JPA (PostgreSQL)
-    - Spring Security (JWT)
-    - Spring Web (REST Controllers)
-- **Banco de Dados**: PostgreSQL (Supabase)
-- **Pool de Conexões**: HikariCP para máxima performance.
-
----
-
-## 🏁 Como Rodar o Backend
-
-### Requisitos
-- JDK 22
-- Maven 3.9+
-
-### Configuração
-As credenciais do Supabase devem ser configuradas no arquivo `src/main/resources/application.properties` ou via variáveis de ambiente.
-
-### Execução
 ```bash
-cd backend
+SPRING_DATASOURCE_URL=jdbc:postgresql://<host>:5432/postgres?sslmode=require
+SPRING_DATASOURCE_USERNAME=<usuario>
+SPRING_DATASOURCE_PASSWORD=<senha>
+SUPABASE_JWKS_URL=https://<projeto>.supabase.co/auth/v1/.well-known/jwks.json
+JWT_SECRET=<segredo-forte>
+GOOGLE_CLIENT_ID=<client-id-google>
+```
+
+O seed turistico roda por padrao contra o banco configurado. Para desativar:
+
+```bash
+SISTUR_SEED_ENABLED=false
+```
+
+## Execucao
+
+```bash
 mvn spring-boot:run
 ```
 
-O servidor iniciará na porta **8080**.
+Swagger:
 
----
+```text
+http://localhost:8080/swagger-ui/index.html
+```
 
-## 📖 Documentação da API
+## Observacoes de lancamento
 
-Após iniciar o servidor, a documentação Swagger estará disponível em:
-`http://localhost:8080/swagger-ui/index.html`
-
-### Principais Endpoints
-- `POST /auth/login`: Autenticação e recebimento de Token JWT.
-- `GET /establishments`: Listagem de restaurantes e hotéis (filtrável).
-- `GET /events`: Agenda de eventos interativa.
-- `GET /itinerary`: Consultas de rotas e planejamentos.
-
----
-
-**SisTur - Backend Inteligente para Turismo.**
+- Use JDK 21 no IntelliJ. O projeto compila com `release 21`; JDK 26 pode quebrar processadores de anotacao.
+- Nao deixe senha de banco ou `JWT_SECRET` versionados.
+- Para Supabase, prefira URL com SSL habilitado.

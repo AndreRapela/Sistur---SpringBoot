@@ -44,7 +44,6 @@ public class TourService {
         );
     }
 
-    @Cacheable(value = "tours", key = "#id")
     public TourDTO findById(Long id, Authentication authentication) {
         TourDTO tourDTO = tourRepository.findById(id)
             .map(this::toDTO)

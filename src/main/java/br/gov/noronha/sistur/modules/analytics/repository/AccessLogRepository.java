@@ -7,6 +7,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Repository
 public interface AccessLogRepository extends JpaRepository<AccessLog, Long> {
@@ -22,6 +23,10 @@ public interface AccessLogRepository extends JpaRepository<AccessLog, Long> {
     long countByActionTypeIn(java.util.Collection<String> actionTypes);
 
     long countByActionTypeAndTimestampAfter(String actionType, LocalDateTime timestamp);
+
+    long countByActionTypeInAndTimestampAfter(java.util.Collection<String> actionTypes, LocalDateTime timestamp);
+
+    List<AccessLog> findByTimestampAfterOrderByTimestampAsc(LocalDateTime timestamp);
     
     @Query("SELECT COUNT(DISTINCT a.userId) FROM AccessLog a WHERE a.userId IS NOT NULL AND a.timestamp > :since")
     long countActiveUsers(@Param("since") LocalDateTime since);

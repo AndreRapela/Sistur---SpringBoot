@@ -9,7 +9,6 @@ import br.gov.noronha.sistur.modules.tourism.service.EstablishmentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
@@ -38,8 +37,15 @@ public class EstablishmentController {
         return ResponseEntity.ok(ApiResponse.success(ests, "Estabelecimentos recuperados com sucesso"));
     }
 
+    @GetMapping("/map")
+    @Cacheable(value = "establishments", key = "'map-' + (#types == null ? 'all' : #types.toString())")
+    public ResponseEntity<ApiResponse<List<EstablishmentDTO>>> getMapEstablishments(
+            @RequestParam(required = false) List<EstablishmentType> types) {
+        List<EstablishmentDTO> ests = establishmentService.findByTypes(types);
+        return ResponseEntity.ok(ApiResponse.success(ests, "Estabelecimentos do mapa recuperados com sucesso"));
+    }
+
     @GetMapping("/{id}")
-    @Cacheable(value = "establishments", key = "#id")
     public ResponseEntity<ApiResponse<EstablishmentDTO>> getById(@PathVariable Long id, Authentication authentication) {
         EstablishmentDTO est = establishmentService.findById(id, authentication);
         return ResponseEntity.ok(ApiResponse.success(est, "Estabelecimento recuperado com sucesso"));
