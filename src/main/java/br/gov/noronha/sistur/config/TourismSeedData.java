@@ -16,8 +16,12 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 @Component
 @RequiredArgsConstructor
@@ -29,6 +33,117 @@ public class TourismSeedData implements ApplicationRunner {
     private static final String HOTEL_PHOTO = null;
     private static final String TOUR_PHOTO = null;
     private static final String SERVICE_PHOTO = null;
+    private static final LocalDate EDITORIAL_VERIFICATION_DATE = LocalDate.of(2026, 7, 21);
+    private static final Map<String, EstablishmentEditorialSeed> ESTABLISHMENT_DETAILS = Map.ofEntries(
+        Map.entry("Restaurante do Vale", new EstablishmentEditorialSeed(
+            "https://restaurantedovale.com/",
+            "https://www.pousadadovale.com/img/Cardaipio_RESTAURANTE_VALE.pdf",
+            "+55 81 97341-4288",
+            "Café 7h-10h; almoço 12h-15h; jantar 19h-22h",
+            "Pratos principais de R$ 145 a R$ 210",
+            "Peixe Delegado - R$ 145|Cachorro - R$ 170|Cacimba - R$ 195",
+            "Almoço para uma visita mais tranquila; no jantar, reserve com antecedência.",
+            "Ambiente ao ar livre: noites de tempo firme valorizam a experiência.",
+            "Vegetariano, Vegano, Opções sem glúten, Cardápio infantil, Reservas",
+            "https://restaurantedovale.com/"
+        )),
+        Map.entry("O Pico", new EstablishmentEditorialSeed(
+            "https://opiconoronha.com.br/",
+            null,
+            "+55 81 3619-1377",
+            "Seg, ter e qui-dom: 12h-22h; quarta: fechado",
+            "Cerca de R$ 200 por pessoa; confirme no cardápio",
+            "Cozinha regional contemporânea|Drinks autorais|Pratos brasileiros reinterpretados",
+            "Almoço ou início da noite; aos domingos, confirme a programação musical.",
+            "Boa opção para qualquer clima; prefira a área interna em dias de chuva.",
+            "Reservas, Área externa, Wi-Fi, Drinks",
+            "https://restaurantguru.com.br/O-Pico-Brazil-2"
+        )),
+        Map.entry("Xica da Silva", new EstablishmentEditorialSeed(
+            null,
+            null,
+            "+55 81 3619-0437",
+            "Todos os dias: 12h-23h",
+            null,
+            "Peixe mestiço|Frutos do mar|Cozinha brasileira contemporânea",
+            "Funciona para almoço e jantar; confirme reserva nos períodos de maior movimento.",
+            "Opção prática também em dias nublados ou chuvosos.",
+            "Almoço, Jantar, Bar, Área externa, Opções vegetarianas",
+            "https://www.noronha.pe.gov.br/gastronomia/restaurantes/"
+        )),
+        Map.entry("Varanda Noronha", new EstablishmentEditorialSeed(
+            null,
+            null,
+            "+55 81 99824-4382",
+            "Qui-ter: 12h-21h30; quarta: fechado",
+            null,
+            "Culinária regional contemporânea|Peixes e frutos do mar|Pratos para compartilhar",
+            "Almoço com mais calma ou jantar mediante reserva.",
+            "Ambiente adequado para qualquer clima; confirme a disponibilidade da área externa.",
+            "Reservas, Almoço, Jantar, Pratos para compartilhar",
+            "https://www.noronha.pe.gov.br/gastronomia/restaurantes/"
+        )),
+        Map.entry("Mergulhão", new EstablishmentEditorialSeed(
+            null,
+            null,
+            null,
+            null,
+            "Faixa alta; confirme o cardápio atual",
+            "Siri cremoso na manga|Peixe na crosta de amêndoas|Peixe com purê de banana e coco",
+            "Chegue antes do pôr do sol para aproveitar a vista do Porto.",
+            "Tempo aberto favorece a vista; em dias de vento, confirme a mesa e a área disponível.",
+            "Vista para o mar, Almoço, Jantar, Reservas",
+            "https://www.tripadvisor.com.br/Restaurant_Review-g616328-d2002558-Reviews-Mergulhao-Fernando_de_Noronha_State_of_Pernambuco.html"
+        )),
+        Map.entry("Benedita Cozinha Afetiva", new EstablishmentEditorialSeed(
+            null,
+            null,
+            null,
+            null,
+            "Referência publicada: pratos de R$ 112 a R$ 198; confirme o menu sazonal",
+            "Méqui Fish - R$ 112|Peixe com banana - R$ 194|Tuna Wellington - R$ 188|Nhoque de mandioca com camarão - R$ 194",
+            "Ideal para jantar; reserve e confirme o menu sazonal do dia.",
+            "Boa escolha em noite chuvosa; a cozinha trabalha com ingredientes sazonais.",
+            "Menu sazonal, Forno a lenha, Brasa, Opções vegetarianas, Reservas",
+            "https://www.cnnbrasil.com.br/viagemegastronomia/gastronomia/dario-costa-e-seu-benedita-cozinha-transformam-o-cenario-gastronomico-de-noronha/"
+        )),
+        Map.entry("Márcio Sushi", new EstablishmentEditorialSeed(
+            null,
+            null,
+            null,
+            null,
+            "Em geral, R$ 60 a R$ 120 por pessoa",
+            "Combinados de sushi|Sashimi de peixe fresco|Temakis",
+            "Prefira o início da noite para encontrar mais opções de peixe fresco.",
+            "Boa opção para qualquer clima.",
+            "Sushi, Peixe fresco, Jantar",
+            "https://restaurantguru.com.br/Marcio-Sushi-Brazil"
+        )),
+        Map.entry("Cigana do Cajueiro", new EstablishmentEditorialSeed(
+            null,
+            null,
+            null,
+            null,
+            "Pratos principais em torno de R$ 98 a R$ 125; confirme valores",
+            "Risoto da ilha - R$ 125|Atum selado - R$ 98|Croquetas polvorosas - R$ 50",
+            "Jantar tranquilo; reserve para datas especiais e fins de semana.",
+            "Ambiente acolhedor para qualquer clima.",
+            "Jantar, Frutos do mar, Reservas, Drinks",
+            "https://www.tripadvisor.com.br/Restaurant_Review-g616328-d23391455-Reviews-Restaurante_Cigana_Do_Cajueiro_Noronha-Fernando_de_Noronha_State_of_Pernambuco.html"
+        )),
+        Map.entry("Bar do Meio", new EstablishmentEditorialSeed(
+            "https://www.bardomeionoronha.com/",
+            "https://www.bardomeionoronha.com/cardapio/",
+            null,
+            null,
+            "Pratos principais de R$ 140 a R$ 220; porções a partir de R$ 80",
+            "Peixe na bananeira - R$ 180|Atum Noronha - R$ 195|Risoto de polvo - R$ 210|Ceviche capim-santo - R$ 140",
+            "Chegue antes do pôr do sol; confirme reserva, acesso e programação do dia.",
+            "Tempo aberto valoriza o pôr do sol e a área externa.",
+            "Pôr do sol, Área externa, Drinks, Opções vegetarianas, Reservas",
+            "https://www.bardomeionoronha.com/cardapio/"
+        ))
+    );
 
     private final EstablishmentRepository establishmentRepository;
     private final TouristPointRepository touristPointRepository;
@@ -213,7 +328,62 @@ public class TourismSeedData implements ApplicationRunner {
             establishment.setIsPremiumExclusive(false);
         }
 
+        applyEditorialDetails(establishment);
+
         establishmentRepository.save(establishment);
+    }
+
+    private void applyEditorialDetails(Establishment establishment) {
+        if (isBlank(establishment.getGoogleMapsUrl())) {
+            establishment.setGoogleMapsUrl(googleSearchUrl(establishment.getName()));
+        }
+
+        EstablishmentEditorialSeed details = ESTABLISHMENT_DETAILS.get(establishment.getName());
+        if (details == null) {
+            if (isBlank(establishment.getBestVisitTime())) {
+                establishment.setBestVisitTime(defaultBestVisitTime(establishment.getType()));
+            }
+            return;
+        }
+
+        setIfBlank(establishment.getWebsiteUrl(), details.websiteUrl(), establishment::setWebsiteUrl);
+        setIfBlank(establishment.getMenuUrl(), details.menuUrl(), establishment::setMenuUrl);
+        setIfBlank(establishment.getContactNumber(), details.contactNumber(), establishment::setContactNumber);
+        if (isBlank(establishment.getOpeningHours()) || establishment.getOpeningHours().startsWith("Consulte")) {
+            setIfBlank(null, details.openingHours(), establishment::setOpeningHours);
+        }
+        setIfBlank(establishment.getPriceRange(), details.priceRange(), establishment::setPriceRange);
+        setIfBlank(establishment.getPopularDishes(), details.popularDishes(), establishment::setPopularDishes);
+        setIfBlank(establishment.getBestVisitTime(), details.bestVisitTime(), establishment::setBestVisitTime);
+        setIfBlank(establishment.getWeatherAdvice(), details.weatherAdvice(), establishment::setWeatherAdvice);
+        if (!isBlank(details.amenities()) &&
+                (isBlank(establishment.getAmenities()) || establishment.getAmenities().equals(establishment.getFoodType()))) {
+            establishment.setAmenities(details.amenities());
+        }
+        setIfBlank(establishment.getDataSourceUrl(), details.sourceUrl(), establishment::setDataSourceUrl);
+        if (establishment.getDataVerifiedAt() == null) {
+            establishment.setDataVerifiedAt(EDITORIAL_VERIFICATION_DATE);
+        }
+    }
+
+    private void setIfBlank(String current, String value, java.util.function.Consumer<String> setter) {
+        if (isBlank(current) && !isBlank(value)) {
+            setter.accept(value);
+        }
+    }
+
+    private String defaultBestVisitTime(EstablishmentType type) {
+        if (type == EstablishmentType.BAR) return "Fim da tarde e início da noite.";
+        if (type == EstablishmentType.RESTAURANT) return "Confirme o horário e reserve nos períodos de maior movimento.";
+        if (type == EstablishmentType.HOTEL || type == EstablishmentType.POUSADA || type == EstablishmentType.RESORT) {
+            return "Consulte disponibilidade e condições de check-in antes da chegada.";
+        }
+        return "Consulte o funcionamento no Google antes de sair.";
+    }
+
+    private String googleSearchUrl(String name) {
+        String query = URLEncoder.encode(name + " Fernando de Noronha", StandardCharsets.UTF_8);
+        return "https://www.google.com/maps/search/?api=1&query=" + query;
     }
 
     private void upsertTour(TourSeed seed) {
@@ -362,6 +532,7 @@ public class TourismSeedData implements ApplicationRunner {
 
     private record PointSeed(String name, String description, String category, String location, String accessType, boolean requiresTicket, boolean requiresGuide, String bestTime, String latitude, String longitude) {}
     private record EstablishmentSeed(String name, String description, EstablishmentType type, String category, String location, String photoUrl, String averagePrice, String rating, String latitude, String longitude) {}
+    private record EstablishmentEditorialSeed(String websiteUrl, String menuUrl, String contactNumber, String openingHours, String priceRange, String popularDishes, String bestVisitTime, String weatherAdvice, String amenities, String sourceUrl) {}
     private record TourSeed(String name, String description, String category, String location, String price, String latitude, String longitude) {}
     private record EventSeed(String title, String description, String category, String location, LocalDateTime date, String latitude, String longitude) {}
 }

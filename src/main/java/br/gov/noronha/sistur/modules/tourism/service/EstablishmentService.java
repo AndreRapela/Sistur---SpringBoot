@@ -55,7 +55,11 @@ public class EstablishmentService {
             e.getFoodType(), e.getAveragePrice(), e.getRating(),
             e.getLocation(), e.getPhotoUrl(), e.getInstagramUrl(),
             e.getWebsiteUrl(), e.getOpeningHours(), e.getContactNumber(),
-            e.getAmenities(), e.getDiscountDescription(), e.getDiscountHours(), e.getIsPremiumExclusive(), e.getLatitude(), e.getLongitude()
+            e.getAmenities(), e.getGooglePlaceId(), e.getGoogleMapsUrl(),
+            e.getMenuUrl(), e.getPriceRange(), e.getPopularDishes(),
+            e.getBestVisitTime(), e.getWeatherAdvice(), e.getReviewCount(),
+            e.getDataSourceUrl(), e.getDataVerifiedAt(), e.getDiscountDescription(),
+            e.getDiscountHours(), e.getIsPremiumExclusive(), e.getLatitude(), e.getLongitude()
         );
     }
 
@@ -137,6 +141,16 @@ public class EstablishmentService {
             .openingHours(d.openingHours())
             .contactNumber(d.contactNumber())
             .amenities(d.amenities())
+            .googlePlaceId(d.googlePlaceId())
+            .googleMapsUrl(d.googleMapsUrl())
+            .menuUrl(d.menuUrl())
+            .priceRange(d.priceRange())
+            .popularDishes(d.popularDishes())
+            .bestVisitTime(d.bestVisitTime())
+            .weatherAdvice(d.weatherAdvice())
+            .reviewCount(d.reviewCount())
+            .dataSourceUrl(d.dataSourceUrl())
+            .dataVerifiedAt(d.dataVerifiedAt())
             .discountDescription(d.discountDescription())
             .discountHours(d.discountHours())
             .isPremiumExclusive(d.isPremiumExclusive())
@@ -158,6 +172,16 @@ public class EstablishmentService {
         e.setOpeningHours(d.openingHours());
         e.setContactNumber(d.contactNumber());
         e.setAmenities(d.amenities());
+        e.setGooglePlaceId(d.googlePlaceId());
+        e.setGoogleMapsUrl(d.googleMapsUrl());
+        e.setMenuUrl(d.menuUrl());
+        e.setPriceRange(d.priceRange());
+        e.setPopularDishes(d.popularDishes());
+        e.setBestVisitTime(d.bestVisitTime());
+        e.setWeatherAdvice(d.weatherAdvice());
+        e.setReviewCount(d.reviewCount());
+        e.setDataSourceUrl(d.dataSourceUrl());
+        e.setDataVerifiedAt(d.dataVerifiedAt());
         e.setDiscountDescription(d.discountDescription());
         e.setDiscountHours(d.discountHours());
         e.setIsPremiumExclusive(d.isPremiumExclusive());

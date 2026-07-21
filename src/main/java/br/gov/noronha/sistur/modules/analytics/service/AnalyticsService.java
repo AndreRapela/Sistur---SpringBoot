@@ -41,9 +41,12 @@ public class AnalyticsService {
 
     private static final List<String> CONVERSION_ACTIONS = List.of(
         "WHATSAPP_CLICK",
+        "PHONE_CLICK",
         "WEBSITE_CLICK",
+        "MENU_CLICK",
         "BOOKING_CLICK",
         "MAP_CLICK",
+        "DIRECTIONS_CLICK",
         "GOOGLE_SERVICE_CLICK",
         "GOOGLE_CATEGORY_CLICK",
         "ITINERARY_ADD",
@@ -51,9 +54,12 @@ public class AnalyticsService {
     );
     private static final List<String> BUSINESS_ACTIONS = List.of(
         "WHATSAPP_CLICK",
+        "PHONE_CLICK",
         "WEBSITE_CLICK",
+        "MENU_CLICK",
         "BOOKING_CLICK",
         "MAP_CLICK",
+        "DIRECTIONS_CLICK",
         "GOOGLE_SERVICE_CLICK",
         "ITINERARY_ADD"
     );
@@ -63,6 +69,7 @@ public class AnalyticsService {
         "CATEGORY_FILTER",
         "SEARCH",
         "MAP_CLICK",
+        "DIRECTIONS_CLICK",
         "GOOGLE_SERVICE_CLICK",
         "GOOGLE_CATEGORY_CLICK",
         "ITINERARY_ADD"
@@ -158,7 +165,7 @@ public class AnalyticsService {
         long totalConversions = accessLogRepository.countByActionTypeIn(CONVERSION_ACTIONS);
         long requestsLast30Days = recentLogs.size();
         long conversionsLast30Days = countActions(recentLogs, CONVERSION_ACTIONS);
-        long googleServiceClicks = countAction(recentLogs, "GOOGLE_SERVICE_CLICK");
+        long googleServiceClicks = countActions(recentLogs, List.of("GOOGLE_SERVICE_CLICK", "DIRECTIONS_CLICK"));
         long googleCategoryClicks = countAction(recentLogs, "GOOGLE_CATEGORY_CLICK");
         long googleClicks = googleServiceClicks + googleCategoryClicks;
         long itineraryAdds = countAction(recentLogs, "ITINERARY_ADD");
@@ -209,10 +216,10 @@ public class AnalyticsService {
             googleConversionRate,
             toCategoryEntries(categoryDemand),
             toCategoryEntries(conversionByCategory),
-            topEntries(recentLogs, log -> isAction(log, "GOOGLE_SERVICE_CLICK") || isAction(log, "GOOGLE_CATEGORY_CLICK"), establishments, tours, touristPoints, events),
+            topEntries(recentLogs, log -> isAction(log, "GOOGLE_SERVICE_CLICK") || isAction(log, "GOOGLE_CATEGORY_CLICK") || isAction(log, "DIRECTIONS_CLICK"), establishments, tours, touristPoints, events),
             topEntries(recentLogs, log -> isAction(log, "VIEW") && log.getTargetId() != null, establishments, tours, touristPoints, events),
             dailyMetrics(recentLogs, startDate, log -> isAction(log, "REGISTER_SUCCESS")),
-            dailyMetrics(recentLogs, startDate, log -> isAction(log, "GOOGLE_SERVICE_CLICK") || isAction(log, "GOOGLE_CATEGORY_CLICK")),
+            dailyMetrics(recentLogs, startDate, log -> isAction(log, "GOOGLE_SERVICE_CLICK") || isAction(log, "GOOGLE_CATEGORY_CLICK") || isAction(log, "DIRECTIONS_CLICK")),
             dailyMetrics(recentLogs, startDate, log -> true),
             funnel
         );
@@ -224,9 +231,11 @@ public class AnalyticsService {
 
         long views = accessLogRepository.countByTargetTypeAndTargetIdAndActionType("ESTABLISHMENT", establishmentId, "VIEW");
         long whatsappClicks = accessLogRepository.countByTargetTypeAndTargetIdAndActionType("ESTABLISHMENT", establishmentId, "WHATSAPP_CLICK");
-        long mapClicks = accessLogRepository.countByTargetTypeAndTargetIdAndActionType("ESTABLISHMENT", establishmentId, "MAP_CLICK");
+        long mapClicks = accessLogRepository.countByTargetTypeAndTargetIdAndActionType("ESTABLISHMENT", establishmentId, "MAP_CLICK")
+            + accessLogRepository.countByTargetTypeAndTargetIdAndActionType("ESTABLISHMENT", establishmentId, "DIRECTIONS_CLICK");
         long bookingClicks = accessLogRepository.countByTargetTypeAndTargetIdAndActionType("ESTABLISHMENT", establishmentId, "BOOKING_CLICK");
-        long websiteClicks = accessLogRepository.countByTargetTypeAndTargetIdAndActionType("ESTABLISHMENT", establishmentId, "WEBSITE_CLICK");
+        long websiteClicks = accessLogRepository.countByTargetTypeAndTargetIdAndActionType("ESTABLISHMENT", establishmentId, "WEBSITE_CLICK")
+            + accessLogRepository.countByTargetTypeAndTargetIdAndActionType("ESTABLISHMENT", establishmentId, "MENU_CLICK");
         long itineraryAdds = accessLogRepository.countByTargetTypeAndTargetIdAndActionType("ESTABLISHMENT", establishmentId, "ITINERARY_ADD");
 
         Map<String, Long> conversionsByAction = new LinkedHashMap<>();
