@@ -22,9 +22,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Arrays;
+import java.util.LinkedHashMap;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.security.core.Authentication;
 
@@ -200,8 +204,49 @@ public class EstablishmentService {
 
         return establishmentRepository.findByTypeInOrderByNameAsc(typesToLoad)
             .stream()
+            .collect(Collectors.toMap(
+                establishment -> canonicalPublicName(establishment.getName()).toLowerCase(Locale.ROOT),
+                establishment -> establishment,
+                this::preferredPublicRecord,
+                LinkedHashMap::new
+            ))
+            .values()
+            .stream()
             .map(this::toDTO)
             .collect(Collectors.toList());
+    }
+
+    private Establishment preferredPublicRecord(Establishment first, Establishment second) {
+        boolean firstUsesCanonicalName = first.getName().equalsIgnoreCase(canonicalPublicName(first.getName()));
+        boolean secondUsesCanonicalName = second.getName().equalsIgnoreCase(canonicalPublicName(second.getName()));
+        if (firstUsesCanonicalName != secondUsesCanonicalName) {
+            return secondUsesCanonicalName ? second : first;
+        }
+        return completenessScore(second) > completenessScore(first) ? second : first;
+    }
+
+    private int completenessScore(Establishment establishment) {
+        return Stream.of(
+            establishment.getDescription(),
+            establishment.getOpeningHours(),
+            establishment.getPriceRange(),
+            establishment.getPopularDishes(),
+            establishment.getWebsiteUrl(),
+            establishment.getContactNumber(),
+            establishment.getDataSourceUrl()
+        ).mapToInt(value -> value == null || value.isBlank() ? 0 : 1).sum();
+    }
+
+    private String canonicalPublicName(String name) {
+        if (name == null) return "";
+        Map<String, String> aliases = Map.of(
+            "varanda de noronha", "Varanda Noronha",
+            "farmácia noronha", "Farmácia Fernando de Noronha",
+            "farmácia ilha farma", "Farmácia Nativa",
+            "feirinha da vila dos remédios", "Feira Orgânica de Noronha",
+            "banco 24 horas noronha", "Banco24Horas - Aeroporto de Noronha"
+        );
+        return aliases.getOrDefault(name.trim().toLowerCase(Locale.ROOT), name.trim());
     }
 
     private Long resolveUserId(Authentication authentication) {
