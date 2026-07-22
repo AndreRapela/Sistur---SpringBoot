@@ -34,6 +34,26 @@ public class TourismSeedData implements ApplicationRunner {
     private static final String TOUR_PHOTO = null;
     private static final String SERVICE_PHOTO = null;
     private static final LocalDate EDITORIAL_VERIFICATION_DATE = LocalDate.of(2026, 7, 21);
+    private static final String ALGA_TOUR_NAME = "Ilha Tour - Alga Noronha";
+    private static final TourEditorialSeed ALGA_TOUR_DETAILS = new TourEditorialSeed(
+        "/assets/tours/alga-ilha-tour.jpg",
+        "Alga Noronha",
+        "5581992548000",
+        "5.0",
+        165,
+        "Tripadvisor",
+        "https://www.tripadvisor.com/AttractionProductReview-g616328-d26877667-CITY_TOUR_Complete_Island_Tour_in_Fernando_de_Noronha-Fernando_de_Noronha_State_of.html",
+        "Aproximadamente 8 horas",
+        "08h30 às 18h30, com término após o pôr do sol",
+        "Transfer de ida e volta na hospedagem",
+        "Mirante e Praia do Sancho|Praia do Sueste|Mirante do Leão|Capela de São Pedro|Buraco da Raquel|Praia do Porto|Cacimba do Padre|Baía dos Porcos|Mirante do Boldró",
+        "Guia credenciado|Veículo 4x4|Transfer de ida e volta na hospedagem|Parada para mergulho livre, conforme condições do mar",
+        "Ingresso do Parque Nacional Marinho|Alimentação e bebidas",
+        "Ingresso do Parque Nacional Marinho obrigatório|Levar água, proteção solar, chapéu e calçado seguro|Roteiro sujeito às condições climáticas, do mar e de acesso",
+        "https://www.alganoronha.com.br/service-page/ilha-tour-em-fernando-de-noronha",
+        "https://www.google.com/maps/search/?api=1&query=Alga%20Noronha%20Fernando%20de%20Noronha",
+        "https://www.alganoronha.com.br/service-page/ilha-tour-em-fernando-de-noronha"
+    );
     private static final Map<String, EstablishmentEditorialSeed> ESTABLISHMENT_DETAILS = Map.ofEntries(
         Map.entry("Restaurante do Vale", new EstablishmentEditorialSeed(
             "https://restaurantedovale.com/",
@@ -240,9 +260,16 @@ public class TourismSeedData implements ApplicationRunner {
     }
 
     private void seedTours() {
+        if (!tourRepository.existsByNameIgnoreCase(ALGA_TOUR_NAME)) {
+            tourRepository.findByNameIgnoreCase("Ilha Tour 360").ifPresent(tour -> {
+                tour.setName(ALGA_TOUR_NAME);
+                tourRepository.save(tour);
+            });
+        }
+
         List<TourSeed> tours = List.of(
             new TourSeed("Ingresso Parque Nacional Marinho", "Ingresso oficial do Parque Nacional Marinho de Fernando de Noronha. Brasileiros pagam R$ 192,00 e o publico geral paga R$ 384,00; a validade informada pelo parque e de 10 dias.", "Ingresso", "Centro de Visitantes ICMBio / Parnanoronha", "192", "-3.84900", "-32.41900"),
-            new TourSeed("Ilha Tour 360", "Passeio terrestre de dia inteiro para conhecer praias, mirantes e pontos clássicos da ilha.", "Ilha Tour", "Agências locais", "342", "-3.84150", "-32.41160"),
+            new TourSeed(ALGA_TOUR_NAME, "Passeio de dia inteiro em veículo 4x4 com guia credenciado, praias, mirantes, parada para mergulho livre e encerramento após o pôr do sol.", "Ilha Tour", "Alga Tour in Noronha", "249", "-3.84090", "-32.41080"),
             new TourSeed("Passeio de barco Mar de Dentro", "Navegação pelo mar de dentro com vista para ilhas secundárias, Sancho e Dois Irmãos.", "Barco", "Porto de Santo Antônio", "323", "-3.83320", "-32.40420"),
             new TourSeed("Canoa havaiana ao amanhecer", "Experiência em canoa para ver a ilha de outro ângulo e aproveitar o mar cedo.", "Canoa", "Praia do Porto", null, "-3.83340", "-32.40460"),
             new TourSeed("Mergulho de batismo", "Mergulho acompanhado para iniciantes em pontos protegidos de Noronha.", "Mergulho", "Porto de Santo Antônio", null, "-3.83300", "-32.40360"),
@@ -399,7 +426,32 @@ public class TourismSeedData implements ApplicationRunner {
         tour.setLongitude(bd(seed.longitude()));
         setTrustedPhotoUrl(tour, TOUR_PHOTO);
 
+        if (ALGA_TOUR_NAME.equals(seed.name())) {
+            applyTourDetails(tour, ALGA_TOUR_DETAILS);
+        }
+
         tourRepository.save(tour);
+    }
+
+    private void applyTourDetails(Tour tour, TourEditorialSeed details) {
+        tour.setPhotoUrl(details.photoUrl());
+        tour.setPhotoCredit(details.photoCredit());
+        tour.setContactNumber(details.contactNumber());
+        tour.setRating(bd(details.rating()));
+        tour.setReviewCount(details.reviewCount());
+        tour.setReviewSource(details.reviewSource());
+        tour.setReviewUrl(details.reviewUrl());
+        tour.setDuration(details.duration());
+        tour.setSchedule(details.schedule());
+        tour.setMeetingPoint(details.meetingPoint());
+        tour.setItinerary(details.itinerary());
+        tour.setIncludedItems(details.includedItems());
+        tour.setExcludedItems(details.excludedItems());
+        tour.setRequirements(details.requirements());
+        tour.setBookingUrl(details.bookingUrl());
+        tour.setGoogleMapsUrl(details.googleMapsUrl());
+        tour.setSourceUrl(details.sourceUrl());
+        tour.setDataVerifiedAt(EDITORIAL_VERIFICATION_DATE);
     }
 
     private void upsertEvent(EventSeed seed) {
@@ -533,6 +585,7 @@ public class TourismSeedData implements ApplicationRunner {
     private record PointSeed(String name, String description, String category, String location, String accessType, boolean requiresTicket, boolean requiresGuide, String bestTime, String latitude, String longitude) {}
     private record EstablishmentSeed(String name, String description, EstablishmentType type, String category, String location, String photoUrl, String averagePrice, String rating, String latitude, String longitude) {}
     private record EstablishmentEditorialSeed(String websiteUrl, String menuUrl, String contactNumber, String openingHours, String priceRange, String popularDishes, String bestVisitTime, String weatherAdvice, String amenities, String sourceUrl) {}
+    private record TourEditorialSeed(String photoUrl, String photoCredit, String contactNumber, String rating, Integer reviewCount, String reviewSource, String reviewUrl, String duration, String schedule, String meetingPoint, String itinerary, String includedItems, String excludedItems, String requirements, String bookingUrl, String googleMapsUrl, String sourceUrl) {}
     private record TourSeed(String name, String description, String category, String location, String price, String latitude, String longitude) {}
     private record EventSeed(String title, String description, String category, String location, LocalDateTime date, String latitude, String longitude) {}
 }
