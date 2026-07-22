@@ -35,6 +35,7 @@ public class TourismSeedData implements ApplicationRunner {
     private static final String SERVICE_PHOTO = null;
     private static final LocalDate EDITORIAL_VERIFICATION_DATE = LocalDate.of(2026, 7, 21);
     private static final String ALGA_TOUR_NAME = "Ilha Tour - Alga Noronha";
+    private static final String LANCHA_TOUR_NAME = "Passeio de Lancha Noronha";
     private static final TourEditorialSeed ALGA_TOUR_DETAILS = new TourEditorialSeed(
         "/assets/tours/alga-ilha-tour.jpg",
         "Alga Noronha",
@@ -53,6 +54,25 @@ public class TourismSeedData implements ApplicationRunner {
         "https://www.alganoronha.com.br/service-page/ilha-tour-em-fernando-de-noronha",
         "https://www.google.com/maps/search/?api=1&query=Alga%20Noronha%20Fernando%20de%20Noronha",
         "https://www.alganoronha.com.br/service-page/ilha-tour-em-fernando-de-noronha"
+    );
+    private static final TourEditorialSeed LANCHA_TOUR_DETAILS = new TourEditorialSeed(
+        "/assets/places/bubba-noronha-hero.png",
+        "Passeio de Lancha Noronha",
+        "558191338538",
+        "5.0",
+        6,
+        "Tripadvisor",
+        "https://www.tripadvisor.com.br/Attraction_Review-g616328-d33258023-Reviews-Lancha_First-Fernando_de_Noronha_State_of_Pernambuco.html",
+        "Cerca de 4 horas",
+        "Manhã: 9h às 13h | Entardecer: 14h30 ao pôr do sol",
+        "Píer do Porto de Santo Antônio, com chegada 15 minutos antes",
+        "Porto de Santo Antônio|Biboca|Rugido do Leão|Praia do Cachorro|Praia do Meio|Morro de Fora|Praia da Conceição|Praia do Boldró|Praia do Americano|Praia do Bode|Quixabinha|Cacimba do Padre",
+        "Plana sub|Som Bluetooth|Wi-Fi via satélite|Parada para mergulho livre|Petiscos|Tapete flutuante|Cooler com água e gelo",
+        "Bebidas|Material de mergulho|Transfer até o porto",
+        "Levar máscara, snorkel e colete para o plana sub|Colete obrigatório para menores de 13 anos|Não levar copos ou taças de vidro|Passeio sujeito às condições do mar",
+        "https://passeiodelanchanoronha.com.br/",
+        "https://www.google.com/maps/search/?api=1&query=Passeio%20de%20Lancha%20Noronha%20Porto%20de%20Santo%20Antonio",
+        "https://passeiodelanchanoronha.com.br/"
     );
     private static final Map<String, EstablishmentEditorialSeed> ESTABLISHMENT_DETAILS = Map.ofEntries(
         Map.entry("Restaurante do Vale", new EstablishmentEditorialSeed(
@@ -281,7 +301,7 @@ public class TourismSeedData implements ApplicationRunner {
             new TourSeed("Trilha Capim-Açu guiada", "Trilha longa para viajantes com preparo físico e interesse em paisagens menos óbvias.", "Trilha", "Parque Nacional", null, "-3.85700", "-32.42020"),
             new TourSeed("Trilha Costa Esmeralda", "Caminhada pela sequência de praias do mar de dentro, com paradas para banho.", "Trilha", "Costa oeste", null, "-3.84860", "-32.42600"),
             new TourSeed("Trilha Costa Azul", "Experiência guiada no mar de fora com visual costeiro e orientação ambiental.", "Trilha", "Mar de fora", null, "-3.84490", "-32.39720"),
-            new TourSeed("Lancha privativa", "Passeio personalizado de lancha para grupos, com paradas para banho e contemplação.", "Barco", "Porto de Santo Antônio", null, "-3.83320", "-32.40420"),
+            new TourSeed(LANCHA_TOUR_NAME, "Passeio privativo pela APA de Fernando de Noronha em lancha de 36 pés, com gastronomia a bordo, parada para mergulho e navegação até a Cacimba do Padre.", "Barco", "Passeio de Lancha Noronha / Lancha First", null, "-3.83320", "-32.40420"),
             new TourSeed("Entardecer no barco", "Navegação curta no fim do dia com vista do pôr do sol a partir do mar.", "Barco", "Porto de Santo Antônio", "362", "-3.83320", "-32.40420"),
             new TourSeed("Bike aquática", "Atividade leve no mar para fotos e contemplação perto das praias urbanas.", "Aventura", "Praia da Conceição", null, "-3.84220", "-32.41730"),
             new TourSeed("Observação de golfinhos", "Saída cedo para observar golfinhos e entender o comportamento da espécie.", "Natureza", "Mirante dos Golfinhos", null, "-3.85240", "-32.44460"),
@@ -428,6 +448,8 @@ public class TourismSeedData implements ApplicationRunner {
 
         if (ALGA_TOUR_NAME.equals(seed.name())) {
             applyTourDetails(tour, ALGA_TOUR_DETAILS);
+        } else if (LANCHA_TOUR_NAME.equals(seed.name())) {
+            applyTourDetails(tour, LANCHA_TOUR_DETAILS);
         }
 
         tourRepository.save(tour);
