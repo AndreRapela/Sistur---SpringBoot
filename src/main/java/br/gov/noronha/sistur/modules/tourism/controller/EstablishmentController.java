@@ -28,7 +28,7 @@ public class EstablishmentController {
     @GetMapping
     @Cacheable(value = "establishments", key = "#type + '-' + #category + '-' + #search + '-' + #pageable.pageNumber")
     public ResponseEntity<ApiResponse<Page<EstablishmentDTO>>> getAllEstablishments(
-            @RequestParam EstablishmentType type,
+            @RequestParam(required = false) EstablishmentType type,
             @RequestParam(required = false) String category,
             @RequestParam(required = false) String search,
             Pageable pageable) {

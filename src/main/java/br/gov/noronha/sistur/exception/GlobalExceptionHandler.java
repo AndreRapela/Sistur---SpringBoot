@@ -1,20 +1,35 @@
 package br.gov.noronha.sistur.exception;
 
 import br.gov.noronha.sistur.dto.ApiResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.*;
+import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import java.util.*;
 import java.util.stream.Collectors;
 
+@Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiResponse<Object>> handleGeneralException(Exception ex) {
-        // Em produção, não expor stacktrace
+        log.error("Erro inesperado ao processar requisicao", ex);
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(ApiResponse.error("Erro interno no servidor. Por favor, tente novamente mais tarde."));
+    }
+
+    @ExceptionHandler({
+            MissingServletRequestParameterException.class,
+            MethodArgumentTypeMismatchException.class,
+            HttpMessageNotReadableException.class
+    })
+    public ResponseEntity<ApiResponse<Object>> handleInvalidRequest(Exception ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(ApiResponse.error("Parametros da requisicao invalidos."));
     }
 
     @ExceptionHandler(RuntimeException.class)
