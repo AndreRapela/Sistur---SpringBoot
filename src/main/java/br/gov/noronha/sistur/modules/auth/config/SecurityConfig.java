@@ -37,6 +37,7 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers(HttpMethod.POST, "/api/auth/login", "/api/auth/google", "/api/auth/register").permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/analytics/**").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/weather/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/events/**", "/api/tours/**", "/api/establishments/**", "/api/tourist-points/**", "/api/itineraries/**").permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/routes/**").permitAll()
                 .requestMatchers("/api/admin/**").hasRole("ADMIN")

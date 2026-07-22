@@ -27,6 +27,25 @@ Opcional, quando o backend passar a validar tokens externos do Supabase diretame
 SUPABASE_JWKS_URL=https://<projeto>.supabase.co/auth/v1/.well-known/jwks.json
 ```
 
+## Clima e segurança
+
+O backend centraliza e mantém em cache as consultas de previsão terrestre e marítima. Para desenvolvimento e avaliação:
+
+```bash
+OPEN_METEO_FORECAST_URL=https://api.open-meteo.com/v1/forecast
+OPEN_METEO_MARINE_URL=https://marine-api.open-meteo.com/v1/marine
+OPEN_METEO_API_KEY=
+WEATHER_CACHE_MINUTES=10
+```
+
+Antes de um lançamento comercial, configure uma assinatura do provedor e mantenha a chave somente no backend:
+
+```bash
+OPEN_METEO_FORECAST_URL=https://customer-api.open-meteo.com/v1/forecast
+OPEN_METEO_MARINE_URL=https://customer-marine-api.open-meteo.com/v1/marine
+OPEN_METEO_API_KEY=<chave-comercial>
+```
+
 O seed turistico roda por padrao contra o banco configurado. Para desativar:
 
 ```bash
