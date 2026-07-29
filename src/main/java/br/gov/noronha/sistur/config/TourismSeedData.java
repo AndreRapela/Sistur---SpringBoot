@@ -14,6 +14,7 @@ import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.net.URLEncoder;
@@ -83,6 +84,7 @@ public class TourismSeedData implements ApplicationRunner {
     private final EventRepository eventRepository;
 
     @Override
+    @Transactional
     public void run(ApplicationArguments args) {
         seedTouristPoints();
         seedEstablishments();
@@ -95,36 +97,36 @@ public class TourismSeedData implements ApplicationRunner {
             new PointSeed("Baía do Sancho", "Praia símbolo de Noronha, com falésias, mirantes e mar transparente para banho e snorkel.", "Praia", "Parque Nacional Marinho", "Parque Nacional", true, false, "Manhã e maré baixa", "-3.85470", "-32.44060"),
             new PointSeed("Baía dos Porcos", "Enseada pequena, rochosa e muito fotogênica, com vista direta para o Morro Dois Irmãos.", "Praia", "Entre Sancho e Cacimba do Padre", "Parque Nacional", true, false, "Maré baixa", "-3.85330", "-32.43580"),
             new PointSeed("Cacimba do Padre", "Praia ampla, conhecida pelo surf e pelo visual do Morro Dois Irmãos.", "Praia", "Costa oeste", "Livre acesso", false, false, "Manhã ou pôr do sol", "-3.85080", "-32.43170"),
-            new PointSeed("Praia do Bode", "Praia de acesso simples e clima mais tranquilo, boa para caminhar e ver o pôr do sol.", "Praia", "Costa oeste", "Livre acesso", false, false, "Fim da tarde", "-3.84930", "-32.42660"),
-            new PointSeed("Praia do Americano", "Faixa de areia reservada entre Boldró e Bode, boa para quem procura menos movimento.", "Praia", "Costa oeste", "Livre acesso", false, false, "Manhã", "-3.84840", "-32.42410"),
+            new PointSeed("Praia do Bode", "Praia de acesso simples e clima mais tranquilo, boa para caminhar e ver o pôr do sol.", "Praia", "Costa oeste", "Livre acesso", false, false, "Fim da tarde", "-3.8480978", "-32.4346966"),
+            new PointSeed("Praia do Americano", "Faixa de areia reservada entre Boldró e Bode, boa para quem procura menos movimento.", "Praia", "Costa oeste", "Livre acesso", false, false, "Manhã", "-3.8469011", "-32.4326487"),
             new PointSeed("Praia do Boldró", "Praia de ondas e piscinas na maré baixa, próxima a um dos mirantes mais procurados da ilha.", "Praia", "Boldró", "Livre acesso", false, false, "Maré baixa", "-3.84740", "-32.42170"),
             new PointSeed("Praia da Conceição", "Praia acessível, com vista para o Morro do Pico e um dos melhores fins de tarde da ilha.", "Praia", "Vila dos Remédios", "Livre acesso", false, false, "Pôr do sol", "-3.84220", "-32.41730"),
-            new PointSeed("Praia do Meio", "Praia central entre Conceição e Cachorro, boa para banho quando o mar está calmo.", "Praia", "Centro histórico", "Livre acesso", false, false, "Manhã", "-3.84090", "-32.41530"),
-            new PointSeed("Praia do Cachorro", "Praia urbana, perto da Vila dos Remédios, com acesso fácil e movimento no fim do dia.", "Praia", "Vila dos Remédios", "Livre acesso", false, false, "Fim da tarde", "-3.84000", "-32.41380"),
-            new PointSeed("Praia da Biboca", "Trecho rochoso aos pés da Fortaleza dos Remédios, bom para fotos e leitura histórica da costa.", "Praia", "Centro histórico", "Livre acesso", false, false, "Manhã", "-3.83920", "-32.41220"),
+            new PointSeed("Praia do Meio", "Praia central entre Conceição e Cachorro, boa para banho quando o mar está calmo.", "Praia", "Centro histórico", "Livre acesso", false, false, "Manhã", "-3.8398526", "-32.4133645"),
+            new PointSeed("Praia do Cachorro", "Praia urbana, perto da Vila dos Remédios, com acesso fácil e movimento no fim do dia.", "Praia", "Vila dos Remédios", "Livre acesso", false, false, "Fim da tarde", "-3.8390276", "-32.4111937"),
+            new PointSeed("Praia da Biboca", "Trecho rochoso aos pés da Fortaleza dos Remédios, bom para fotos e leitura histórica da costa.", "Praia", "Centro histórico", "Livre acesso", false, false, "Manhã", "-3.8376839", "-32.4067263"),
             new PointSeed("Praia do Porto de Santo Antônio", "Área de chegada dos barcos, com naufrágio próximo e águas geralmente boas para snorkel.", "Praia", "Porto", "Livre acesso", false, false, "Manhã", "-3.83340", "-32.40460"),
             new PointSeed("Praia da Caieira", "Praia de natureza mais selvagem, próxima ao Buraco da Raquel e ao Museu do Tubarão.", "Praia", "Região do Porto", "Livre acesso", false, false, "Manhã", "-3.83210", "-32.39910"),
-            new PointSeed("Praia do Atalaia", "Piscina natural sensível, com visita controlada e agendamento pelo Parque Nacional.", "Praia", "Atalaia", "Parque Nacional", true, true, "Maré baixa", "-3.84380", "-32.39580"),
-            new PointSeed("Praia do Sueste", "Baía protegida, procurada para snorkel e observação de tartarugas e vida marinha.", "Praia", "Litoral sudeste", "Parque Nacional", true, false, "Maré baixa", "-3.86500", "-32.42250"),
-            new PointSeed("Praia do Leão", "Praia extensa e preservada, com forte presença de tartarugas e visual selvagem.", "Praia", "Litoral sul", "Parque Nacional", true, false, "Nascer do sol", "-3.87320", "-32.42480"),
-            new PointSeed("Enseada dos Abreus", "Piscinas naturais acessadas por trilha agendada, indicada para maré baixa e guia credenciado.", "Praia", "Sueste", "Parque Nacional", true, true, "Maré baixa", "-3.86670", "-32.41460"),
-            new PointSeed("Mirante dos Dois Irmãos", "Mirante clássico para fotografar a Baía dos Porcos e os morros mais famosos de Noronha.", "Mirante", "PIC Sancho", "Parque Nacional", true, false, "Manhã", "-3.85200", "-32.43680"),
+            new PointSeed("Praia do Atalaia", "Piscina natural sensível, com visita controlada e agendamento pelo Parque Nacional.", "Praia", "Atalaia", "Parque Nacional", true, true, "Maré baixa", "-3.8569884", "-32.4082181"),
+            new PointSeed("Praia do Sueste", "Baía protegida, procurada para snorkel e observação de tartarugas e vida marinha.", "Praia", "Litoral sudeste", "Parque Nacional", true, false, "Maré baixa", "-3.8661700", "-32.4240796"),
+            new PointSeed("Praia do Leão", "Praia extensa e preservada, com forte presença de tartarugas e visual selvagem.", "Praia", "Litoral sul", "Parque Nacional", true, false, "Nascer do sol", "-3.8698046", "-32.4340098"),
+            new PointSeed("Enseada dos Abreus", "Piscinas naturais acessadas por trilha agendada, indicada para maré baixa e guia credenciado.", "Praia", "Sueste", "Parque Nacional", true, true, "Maré baixa", "-3.8644810", "-32.4140772"),
+            new PointSeed("Mirante dos Dois Irmãos", "Mirante clássico para fotografar a Baía dos Porcos e os morros mais famosos de Noronha.", "Mirante", "PIC Sancho", "Parque Nacional", true, false, "Manhã", "-3.8521674", "-32.4421224"),
             new PointSeed("Mirante do Boldró", "Ponto tradicional para pôr do sol com vista da costa oeste e do Morro Dois Irmãos.", "Mirante", "Boldró", "Livre acesso", false, false, "Pôr do sol", "-3.84780", "-32.42290"),
             new PointSeed("Mirante da Baía dos Golfinhos", "Ponto de observação dos golfinhos rotadores, especialmente nas primeiras horas do dia.", "Mirante", "Parque Nacional Marinho", "Parque Nacional", true, false, "Amanhecer", "-3.85240", "-32.44460"),
-            new PointSeed("Ponta das Caracas", "Mirante com vista para formações vulcânicas, ilhas secundárias e mar aberto.", "Mirante", "Sueste", "Parque Nacional", true, false, "Manhã", "-3.87210", "-32.41920"),
+            new PointSeed("Ponta das Caracas", "Mirante com vista para formações vulcânicas, ilhas secundárias e mar aberto.", "Mirante", "Sueste", "Parque Nacional", true, false, "Manhã", "-3.8749098", "-32.4253050"),
             new PointSeed("Buraco da Raquel", "Formação rochosa histórica e ponto contemplativo próximo ao Porto.", "Mirante", "Região do Porto", "Livre acesso", false, false, "Fim da tarde", "-3.83110", "-32.39780"),
-            new PointSeed("Ponta da Sapata", "Extremo de paisagem dramática, visto em passeios de barco e trilhas autorizadas.", "Mirante", "Extremo oeste", "Parque Nacional", true, true, "Manhã", "-3.85770", "-32.45520"),
+            new PointSeed("Ponta da Sapata", "Extremo de paisagem dramática, visto em passeios de barco e trilhas autorizadas.", "Mirante", "Extremo oeste", "Parque Nacional", true, true, "Manhã", "-3.8753129", "-32.4753250"),
             new PointSeed("Fortaleza Nossa Senhora dos Remédios", "Fortificação histórica com vista para o mar e para o centro da ilha.", "Histórico", "Vila dos Remédios", "Livre acesso", false, false, "Fim da tarde", "-3.83940", "-32.41240"),
             new PointSeed("Igreja Nossa Senhora dos Remédios", "Igreja histórica no coração da Vila dos Remédios, próxima ao casario e às praças.", "Histórico", "Vila dos Remédios", "Livre acesso", false, false, "Fim da tarde", "-3.84090", "-32.41080"),
             new PointSeed("Palácio São Miguel", "Sede administrativa histórica da ilha, em área central e fácil de combinar com a Vila.", "Histórico", "Vila dos Remédios", "Livre acesso", false, false, "Fim da tarde", "-3.84110", "-32.41020"),
             new PointSeed("Memorial Noronhense", "Espaço cultural para entender a formação histórica e social de Fernando de Noronha.", "Cultura", "Vila dos Remédios", "Centro histórico", false, false, "Tarde", "-3.84080", "-32.41100"),
             new PointSeed("Museu do Tubarão", "Ponto de visita sobre vida marinha, com restaurante próximo e vista da região do Porto.", "Cultura", "Porto", "Livre acesso", false, false, "Tarde", "-3.83240", "-32.39920"),
-            new PointSeed("Capela de São Pedro dos Pescadores", "Capela pequena e simbólica, ligada à tradição dos pescadores e à paisagem do Porto.", "Cultura", "Porto", "Livre acesso", false, false, "Entardecer", "-3.83320", "-32.40120"),
+            new PointSeed("Capela de São Pedro dos Pescadores", "Capela pequena e simbólica, ligada à tradição dos pescadores e à paisagem do Porto.", "Cultura", "Porto", "Livre acesso", false, false, "Entardecer", "-3.8335099", "-32.3988772"),
             new PointSeed("Centro de Visitantes ICMBio", "Base para informações, ingressos e agendamentos de atrativos do Parque Nacional.", "Serviço turístico", "Boldró", "Serviço turístico", false, false, "Qualquer horário", "-3.84900", "-32.41900"),
             new PointSeed("Projeto Tamar Noronha", "Centro de educação ambiental com programação sobre tartarugas e conservação marinha.", "Educação ambiental", "Boldró", "Livre acesso", false, false, "Fim da tarde", "-3.84960", "-32.41980"),
             new PointSeed("Trilha Capim-Açu", "Trilha longa e exigente por vegetação, costões e paisagens menos urbanas da ilha.", "Trilha", "Parque Nacional Marinho", "Parque Nacional", true, true, "Manhã cedo", "-3.85700", "-32.42020"),
             new PointSeed("Trilha Costa Esmeralda", "Caminhada que conecta praias do mar de dentro, mirantes e paradas para banho.", "Trilha", "Costa oeste", "Livre acesso", false, false, "Manhã", "-3.84860", "-32.42600"),
-            new PointSeed("Trilha Costa Azul", "Roteiro costeiro de visual aberto, com trechos de banho e observação da vida marinha.", "Trilha", "Mar de fora", "Parque Nacional", true, true, "Manhã", "-3.84490", "-32.39720")
+            new PointSeed("Trilha Costa Azul", "Roteiro costeiro de visual aberto, com trechos de banho e observação da vida marinha.", "Trilha", "Mar de fora", "Parque Nacional", true, true, "Manhã", "-3.8425660", "-32.4204443")
         );
 
         points.forEach(this::upsertTouristPoint);
@@ -136,27 +138,27 @@ public class TourismSeedData implements ApplicationRunner {
         List<EstablishmentSeed> establishments = List.of(
             new EstablishmentSeed("Restaurante do Vale", "Cozinha brasileira contemporânea em uma das regiões mais procuradas da ilha.", EstablishmentType.RESTAURANT, "Brasileira", "Vila dos Remédios", FOOD_PHOTO, "180", "4.8", "-3.84080", "-32.41120"),
             new EstablishmentSeed("O Pico", "Restaurante e bar central com clima descontraído, drinks e pratos autorais.", EstablishmentType.RESTAURANT, "Bar e restaurante", "Vila dos Remédios", FOOD_PHOTO, "150", "4.6", "-3.84130", "-32.41080"),
-            new EstablishmentSeed("Xica da Silva", "Restaurante conhecido por pratos regionais, frutos do mar e ambiente acolhedor.", EstablishmentType.RESTAURANT, "Regional", "Floresta Nova", FOOD_PHOTO, "170", "4.5", "-3.84430", "-32.41400"),
+            new EstablishmentSeed("Xica da Silva", "Restaurante conhecido por pratos regionais, frutos do mar e ambiente acolhedor.", EstablishmentType.RESTAURANT, "Regional", "Floresta Nova", FOOD_PHOTO, "170", "4.5", "-3.8467489", "-32.4127174"),
             new EstablishmentSeed("Varanda Noronha", "Cozinha brasileira com peixes, frutos do mar e atendimento voltado ao jantar.", EstablishmentType.RESTAURANT, "Brasileira", "Vila do Trinta", FOOD_PHOTO, "160", "4.5", "-3.84460", "-32.41070"),
-            new EstablishmentSeed("Mergulhão", "Restaurante na região do Porto, famoso pelo visual e por pratos de frutos do mar.", EstablishmentType.RESTAURANT, "Frutos do mar", "Porto de Santo Antônio", FOOD_PHOTO, "190", "4.4", "-3.83300", "-32.40260"),
+            new EstablishmentSeed("Mergulhão", "Restaurante na região do Porto, famoso pelo visual e por pratos de frutos do mar.", EstablishmentType.RESTAURANT, "Frutos do mar", "Porto de Santo Antônio", FOOD_PHOTO, "190", "4.4", "-3.8346431", "-32.4004993"),
             new EstablishmentSeed("Cacimba Bistrô", "Bistrô no centro histórico, próximo à Igreja dos Remédios, com pratos autorais.", EstablishmentType.RESTAURANT, "Bistrô", "Vila dos Remédios", FOOD_PHOTO, "170", "4.5", "-3.84070", "-32.41140"),
             new EstablishmentSeed("Benedita Cozinha Afetiva", "Cozinha afetiva brasileira com proposta intimista para jantar.", EstablishmentType.RESTAURANT, "Brasileira", "Vila dos Remédios", FOOD_PHOTO, "180", "4.5", "-3.84140", "-32.41170"),
             new EstablishmentSeed("Mesa da Ana", "Experiência gastronômica intimista com menu autoral e reservas disputadas.", EstablishmentType.RESTAURANT, "Menu degustação", "Floresta Velha", FOOD_PHOTO, "260", "4.6", "-3.84540", "-32.41310"),
             new EstablishmentSeed("Márcio Sushi", "Sushi e frutos do mar com foco em peixe fresco e ambiente casual.", EstablishmentType.RESTAURANT, "Japonesa", "Vila dos Remédios", FOOD_PHOTO, "150", "4.7", "-3.84190", "-32.41130"),
             new EstablishmentSeed("Acqua Noronha", "Restaurante com menu variado, boas opções de peixes e pratos para compartilhar.", EstablishmentType.RESTAURANT, "Contemporânea", "Vila dos Remédios", FOOD_PHOTO, "150", "4.6", "-3.84250", "-32.41160"),
             new EstablishmentSeed("Cigana do Cajueiro", "Cozinha regional com personalidade local e pratos de frutos do mar.", EstablishmentType.RESTAURANT, "Regional", "Vila dos Remédios", FOOD_PHOTO, "140", "4.6", "-3.84180", "-32.41210"),
-            new EstablishmentSeed("Bar do Meio", "Bar de praia para pôr do sol, petiscos e drinks entre Conceição e Meio.", EstablishmentType.BAR, "Bar de praia", "Praia do Meio", FOOD_PHOTO, "120", "4.4", "-3.84110", "-32.41610"),
+            new EstablishmentSeed("Bar do Meio", "Bar de praia para pôr do sol, petiscos e drinks entre Conceição e Meio.", EstablishmentType.BAR, "Bar de praia", "Praia do Meio", FOOD_PHOTO, "120", "4.4", "-3.8397260", "-32.4147912"),
             new EstablishmentSeed("Duda Rei Bar", "Bar casual muito procurado para bebidas, petiscos e clima de praia.", EstablishmentType.BAR, "Bar", "Praia da Conceição", FOOD_PHOTO, "100", "4.3", "-3.84200", "-32.41730"),
             new EstablishmentSeed("Empório São Miguel", "Opção prática no centro para lanches, refeições rápidas e apoio ao passeio.", EstablishmentType.RESTAURANT, "Lanches", "Vila dos Remédios", FOOD_PHOTO, "80", "4.2", "-3.84100", "-32.41040"),
-            new EstablishmentSeed("Flamboyant", "Restaurante tradicional para almoço e pratos brasileiros no centro da ilha.", EstablishmentType.RESTAURANT, "Brasileira", "Vila dos Remédios", FOOD_PHOTO, "110", "4.2", "-3.84160", "-32.41090"),
-            new EstablishmentSeed("Pousada Maravilha", "Hospedagem de alto padrão próxima ao Sueste, com vista marcante e serviço completo.", EstablishmentType.POUSADA, "Luxo", "Sueste", HOTEL_PHOTO, "1800", "4.8", "-3.86290", "-32.42170"),
+            new EstablishmentSeed("Flamboyant", "Restaurante tradicional para almoço e pratos brasileiros no centro da ilha.", EstablishmentType.RESTAURANT, "Brasileira", "Vila dos Remédios", FOOD_PHOTO, "110", "4.2", "-3.8455326", "-32.4114428"),
+            new EstablishmentSeed("Pousada Maravilha", "Hospedagem de alto padrão próxima ao Sueste, com vista marcante e serviço completo.", EstablishmentType.POUSADA, "Luxo", "Sueste", HOTEL_PHOTO, "1800", "4.8", "-3.8640015", "-32.4280710"),
             new EstablishmentSeed("NANNAI Noronha", "Hospedagem premium com restaurante e experiência voltada ao descanso.", EstablishmentType.RESORT, "Luxo", "Sueste", HOTEL_PHOTO, "2200", "4.8", "-3.86330", "-32.42230"),
             new EstablishmentSeed("Teju-Açu Eco Pousada", "Pousada de charme com proposta integrada à natureza e gastronomia reconhecida.", EstablishmentType.POUSADA, "Charme", "Floresta Velha", HOTEL_PHOTO, "1600", "4.7", "-3.84690", "-32.41730"),
-            new EstablishmentSeed("Dolphin Hotel", "Hotel com estrutura de lazer e localização prática para circular pela ilha.", EstablishmentType.HOTEL, "Hotel", "Floresta Nova", HOTEL_PHOTO, "900", "4.4", "-3.84600", "-32.41500"),
-            new EstablishmentSeed("Pousada do Vale", "Pousada central, arborizada e próxima à Vila dos Remédios.", EstablishmentType.POUSADA, "Charme", "Vila dos Remédios", HOTEL_PHOTO, "1100", "4.6", "-3.84060", "-32.41170"),
+            new EstablishmentSeed("Dolphin Hotel", "Hotel com estrutura de lazer e localização prática para circular pela ilha.", EstablishmentType.HOTEL, "Hotel", "Floresta Nova", HOTEL_PHOTO, "900", "4.4", "-3.8502090", "-32.4200044"),
+            new EstablishmentSeed("Pousada do Vale", "Pousada central, arborizada e próxima à Vila dos Remédios.", EstablishmentType.POUSADA, "Charme", "Vila dos Remédios", HOTEL_PHOTO, "1100", "4.6", "-3.8416200", "-32.4089965"),
             new EstablishmentSeed("Pousada Morena", "Hospedagem de charme com vista para o Morro do Pico e boa estrutura.", EstablishmentType.POUSADA, "Charme", "Floresta Velha", HOTEL_PHOTO, "1300", "4.6", "-3.84490", "-32.41470"),
             new EstablishmentSeed("Pousada Zé Maria", "Pousada tradicional da ilha, conhecida também por experiências gastronômicas.", EstablishmentType.POUSADA, "Tradicional", "Floresta Velha", HOTEL_PHOTO, "1400", "4.5", "-3.84580", "-32.41620"),
-            new EstablishmentSeed("Pousada Triboju", "Hospedagem de charme perto do centro histórico e das praias urbanas.", EstablishmentType.POUSADA, "Charme", "Vila dos Remédios", HOTEL_PHOTO, "1200", "4.5", "-3.84020", "-32.41210"),
+            new EstablishmentSeed("Pousada Triboju", "Hospedagem de charme perto do centro histórico e das praias urbanas.", EstablishmentType.POUSADA, "Charme", "Vila dos Remédios", HOTEL_PHOTO, "1200", "4.5", "-3.8434457", "-32.4135520"),
             new EstablishmentSeed("Solar dos Ventos", "Pousada com visual privilegiado na região do Sueste.", EstablishmentType.POUSADA, "Vista mar", "Sueste", HOTEL_PHOTO, "1500", "4.6", "-3.86400", "-32.42300"),
             new EstablishmentSeed("Maria Bonita Noronha", "Pousada confortável e bem localizada para roteiros de poucos dias.", EstablishmentType.POUSADA, "Charme", "Floresta Nova", HOTEL_PHOTO, "1200", "4.5", "-3.84410", "-32.41380"),
             new EstablishmentSeed("Posto de Combustível BR Noronha", "Ponto de abastecimento essencial para buggy, carros e motos alugadas.", EstablishmentType.GAS_STATION, "Posto", "BR-363", SERVICE_PHOTO, "0", "4.0", "-3.84550", "-32.41550"),
@@ -195,7 +197,7 @@ public class TourismSeedData implements ApplicationRunner {
             new TourSeed("Trilha Atalaia longa", "Roteiro guiado com piscinas naturais e caminhada por trecho sensível do Parque.", "Trilha", "Atalaia", null, "-3.84380", "-32.39580"),
             new TourSeed("Trilha Capim-Açu guiada", "Trilha longa para viajantes com preparo físico e interesse em paisagens menos óbvias.", "Trilha", "Parque Nacional", null, "-3.85700", "-32.42020"),
             new TourSeed("Trilha Costa Esmeralda", "Caminhada pela sequência de praias do mar de dentro, com paradas para banho.", "Trilha", "Costa oeste", null, "-3.84860", "-32.42600"),
-            new TourSeed("Trilha Costa Azul", "Experiência guiada no mar de fora com visual costeiro e orientação ambiental.", "Trilha", "Mar de fora", null, "-3.84490", "-32.39720"),
+            new TourSeed("Trilha Costa Azul", "Experiência guiada no mar de fora com visual costeiro e orientação ambiental.", "Trilha", "Mar de fora", null, "-3.8425660", "-32.4204443"),
             new TourSeed(LANCHA_TOUR_NAME, "Passeio privativo pela APA de Fernando de Noronha em lancha de 36 pés, com gastronomia a bordo, parada para mergulho e navegação até a Cacimba do Padre.", "Barco", "Passeio de Lancha Noronha / Lancha First", null, "-3.83320", "-32.40420"),
             new TourSeed("Entardecer no barco", "Navegação curta no fim do dia com vista do pôr do sol a partir do mar.", "Barco", "Porto de Santo Antônio", "362", "-3.83320", "-32.40420"),
             new TourSeed("Bike aquática", "Atividade leve no mar para fotos e contemplação perto das praias urbanas.", "Aventura", "Praia da Conceição", null, "-3.84220", "-32.41730"),

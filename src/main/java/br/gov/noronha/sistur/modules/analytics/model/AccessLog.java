@@ -27,20 +27,24 @@ public class AccessLog {
 
     private Long userId; // Null for anonymous
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 64)
     private String targetType; // 'ESTABLISHMENT', 'PAGE', 'EVENT'
 
     private Long targetId;
 
+    @Column(length = 255)
     private String targetLabel;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 64)
     private String actionType;
 
+    @Column(length = 512)
     private String pagePath;
 
+    @Column(length = 1024)
     private String referrer;
 
+    @Column(length = 64)
     private String ipAddress;
 
     @Column(nullable = false)

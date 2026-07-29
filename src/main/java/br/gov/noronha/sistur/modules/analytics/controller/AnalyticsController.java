@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.core.Authentication;
 
 @RestController
 @RequestMapping("/api/admin/stats")
@@ -34,7 +35,7 @@ public class AnalyticsController {
 
     @GetMapping("/establishments/{id}")
     @PreAuthorize("hasAnyRole('ADMIN', 'CLIENT')")
-    public ResponseEntity<ApiResponse<EstablishmentStatsDTO>> getEstablishmentStats(@PathVariable Long id) {
-        return ResponseEntity.ok(ApiResponse.success(analyticsService.getEstablishmentStats(id), "Métricas do estabelecimento"));
+    public ResponseEntity<ApiResponse<EstablishmentStatsDTO>> getEstablishmentStats(@PathVariable Long id, Authentication authentication) {
+        return ResponseEntity.ok(ApiResponse.success(analyticsService.getEstablishmentStats(id, authentication), "Métricas do estabelecimento"));
     }
 }

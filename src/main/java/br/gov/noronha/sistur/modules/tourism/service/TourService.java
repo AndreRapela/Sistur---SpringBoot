@@ -5,6 +5,7 @@ import br.gov.noronha.sistur.modules.analytics.repository.AccessLogRepository;
 import br.gov.noronha.sistur.dto.TourDTO;
 import br.gov.noronha.sistur.modules.tourism.model.Tour;
 import br.gov.noronha.sistur.modules.tourism.repository.TourRepository;
+import br.gov.noronha.sistur.modules.auth.model.AuthenticatedUserPrincipal;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
@@ -86,6 +87,9 @@ public class TourService {
         }
 
         Object principal = authentication.getPrincipal();
+        if (principal instanceof AuthenticatedUserPrincipal user && user.id() != null) {
+            return user.id();
+        }
         if (principal instanceof br.gov.noronha.sistur.modules.auth.model.User user && user.getId() != null) {
             return user.getId();
         }

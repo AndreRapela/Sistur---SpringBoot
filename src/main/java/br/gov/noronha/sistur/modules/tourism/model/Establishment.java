@@ -36,16 +36,21 @@ public class Establishment {
 
     private String location;
 
+    @Column(length = 2000)
     private String photoUrl;
 
     private String contactNumber;
 
+    @Column(length = 1000)
     private String instagramUrl;
 
+    @Column(length = 1000)
     private String websiteUrl;
 
+    @Column(length = 1000)
     private String openingHours;
 
+    @Column(length = 2000)
     private String amenities; // JSON or comma separated
 
     private String googlePlaceId;

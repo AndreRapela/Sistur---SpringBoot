@@ -13,4 +13,7 @@ public class RouteResponseDTO {
     private String difficulty; // EASY, MODERATE, HARD
     private double estimatedCalories;
     private List<LocationDTO> optimizedWaypoints;
+    private String routeSource;
+    private boolean estimated;
+    private String travelMode;
 }

@@ -32,6 +32,9 @@ class RouteServiceTest {
         assertTrue(response.getDurationSeconds() > 0L);
         assertFalse(response.getPolyline().isBlank());
         assertEquals("HARD", response.getDifficulty());
+        assertEquals("GEODESIC_ESTIMATE", response.getRouteSource());
+        assertTrue(response.isEstimated());
+        assertEquals("WALKING", response.getTravelMode());
     }
 
     @Test
@@ -48,6 +51,9 @@ class RouteServiceTest {
         assertEquals("EASY", response.getDifficulty());
         assertFalse(response.getPolyline().isBlank());
         assertEquals(1, response.getOptimizedWaypoints().size());
+        assertEquals("GEODESIC_ESTIMATE", response.getRouteSource());
+        assertTrue(response.isEstimated());
+        assertEquals("DRIVING", response.getTravelMode());
     }
 
     private LocationDTO waypoint(double lat, double lng, String name) {

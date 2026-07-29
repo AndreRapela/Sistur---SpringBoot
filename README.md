@@ -76,6 +76,15 @@ Swagger:
 http://localhost:8080/swagger-ui/index.html
 ```
 
+Health check para Render e outros provedores:
+
+```text
+http://localhost:8080/actuator/health
+```
+
+No Render, configure `Health Check Path` como `/actuator/health`. Uma resposta
+`DOWN` indica que a aplicacao iniciou, mas ainda nao conseguiu acessar o banco.
+
 ## Diagnostico do Supabase
 
 Se a inicializacao terminar em `SocketTimeoutException: Connect timed out`, a

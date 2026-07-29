@@ -1,6 +1,7 @@
 package br.gov.noronha.sistur.config;
 
 import br.gov.noronha.sistur.modules.auth.model.User;
+import br.gov.noronha.sistur.modules.auth.model.AuthenticatedUserPrincipal;
 import br.gov.noronha.sistur.modules.auth.repository.UserRepository;
 import br.gov.noronha.sistur.modules.auth.service.TokenService;
 import jakarta.servlet.FilterChain;
@@ -32,7 +33,8 @@ public class SecurityFilter extends OncePerRequestFilter {
         if (login != null && !login.isEmpty()) {
             User user = userRepository.findByEmail(login).orElseThrow(() -> new RuntimeException("User not found"));
             var authorities = Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + user.getRole().name()));
-            var authentication = new UsernamePasswordAuthenticationToken(user, null, authorities);
+            var principal = new AuthenticatedUserPrincipal(user.getId(), user.getEmail());
+            var authentication = new UsernamePasswordAuthenticationToken(principal, null, authorities);
             SecurityContextHolder.getContext().setAuthentication(authentication);
         }
         filterChain.doFilter(request, response);

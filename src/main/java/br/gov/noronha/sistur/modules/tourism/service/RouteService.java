@@ -37,7 +37,8 @@ public class RouteService {
         List<LocationDTO> optimized = optimizeWaypoints(waypoints);
 
         long totalDistance = calculateRouteDistanceMeters(optimized);
-        double speedMetersPerSecond = speedFor(request.getTravelMode());
+        String travelMode = normalizeTravelMode(request.getTravelMode());
+        double speedMetersPerSecond = speedFor(travelMode);
         long duration = totalDistance == 0 ? 0L : Math.max(1L, Math.round(totalDistance / speedMetersPerSecond));
 
         int elevationGain = estimateElevationGainMeters(totalDistance, request.getTravelMode());
@@ -49,6 +50,9 @@ public class RouteService {
                 .estimatedCalories(estimateCalories(totalDistance, request.getTravelMode()))
                 .optimizedWaypoints(optimized)
                 .polyline(encodePolyline(optimized))
+                .routeSource("GEODESIC_ESTIMATE")
+                .estimated(true)
+                .travelMode(travelMode)
                 .build();
     }
 
@@ -235,6 +239,9 @@ public class RouteService {
                 .estimatedCalories(0)
                 .optimizedWaypoints(List.of())
                 .polyline("")
+                .routeSource("GEODESIC_ESTIMATE")
+                .estimated(true)
+                .travelMode("DRIVING")
                 .build();
     }
 }

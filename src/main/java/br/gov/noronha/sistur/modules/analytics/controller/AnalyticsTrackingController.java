@@ -3,6 +3,7 @@ package br.gov.noronha.sistur.modules.analytics.controller;
 import br.gov.noronha.sistur.dto.ApiResponse;
 import br.gov.noronha.sistur.dto.TrackEventRequest;
 import br.gov.noronha.sistur.modules.analytics.service.AnalyticsService;
+import jakarta.validation.Valid;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -20,7 +21,7 @@ public class AnalyticsTrackingController {
     private final AnalyticsService analyticsService;
 
     @PostMapping("/track")
-    public ResponseEntity<ApiResponse<Void>> track(@RequestBody TrackEventRequest request,
+    public ResponseEntity<ApiResponse<Void>> track(@Valid @RequestBody TrackEventRequest request,
                                                    Authentication authentication,
                                                    HttpServletRequest servletRequest) {
         analyticsService.recordEvent(request, authentication, servletRequest.getRemoteAddr());

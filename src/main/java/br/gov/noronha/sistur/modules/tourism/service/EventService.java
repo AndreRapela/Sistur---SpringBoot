@@ -5,6 +5,7 @@ import br.gov.noronha.sistur.modules.analytics.repository.AccessLogRepository;
 import br.gov.noronha.sistur.dto.EventDTO;
 import br.gov.noronha.sistur.modules.tourism.model.Event;
 import br.gov.noronha.sistur.modules.tourism.repository.EventRepository;
+import br.gov.noronha.sistur.modules.auth.model.AuthenticatedUserPrincipal;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.Cacheable;
@@ -83,6 +84,9 @@ public class EventService {
         }
 
         Object principal = authentication.getPrincipal();
+        if (principal instanceof AuthenticatedUserPrincipal user && user.id() != null) {
+            return user.id();
+        }
         if (principal instanceof br.gov.noronha.sistur.modules.auth.model.User user && user.getId() != null) {
             return user.getId();
         }

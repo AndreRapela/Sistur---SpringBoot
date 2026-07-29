@@ -16,6 +16,9 @@ import br.gov.noronha.sistur.modules.tourism.repository.EstablishmentRepository;
 import br.gov.noronha.sistur.modules.tourism.repository.TourRepository;
 import br.gov.noronha.sistur.modules.tourism.repository.TouristPointRepository;
 import br.gov.noronha.sistur.modules.auth.repository.UserRepository;
+import br.gov.noronha.sistur.modules.auth.model.AuthenticatedUserPrincipal;
+import br.gov.noronha.sistur.modules.auth.model.User;
+import br.gov.noronha.sistur.modules.auth.model.UserRole;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.security.core.Authentication;
@@ -87,9 +90,9 @@ public class AnalyticsService {
         "RESTAURANT", "Restaurantes",
         "TOUR", "Passeios",
         "BEACH", "Praias",
-        "POINT", "Pontos turisticos",
-        "CONVENIENCE", "Conveniencias",
-        "HOTEL", "Hoteis",
+        "POINT", "Pontos turísticos",
+        "CONVENIENCE", "Conveniências",
+        "HOTEL", "Hotéis",
         "EVENT", "Eventos"
     );
 
@@ -107,13 +110,13 @@ public class AnalyticsService {
 
         accessLogRepository.save(AccessLog.builder()
             .userId(resolveUserId(authentication))
-            .targetType(request.targetType())
+            .targetType(normalizeTargetType(request.targetType()))
             .targetId(resolveTargetId(request.targetId()))
             .targetLabel(normalizeLabel(request.targetLabel()))
             .actionType(normalizeActionType(request.actionType()))
-            .pagePath(request.pagePath())
-            .referrer(request.referrer())
-            .ipAddress(ipAddress)
+            .pagePath(normalizeText(request.pagePath(), 512))
+            .referrer(normalizeText(request.referrer(), 1024))
+            .ipAddress(normalizeText(ipAddress, 64))
             .timestamp(LocalDateTime.now())
             .build());
     }
@@ -126,11 +129,15 @@ public class AnalyticsService {
         long totalReqs = accessLogRepository.count();
         long totalConversions = accessLogRepository.countByActionTypeIn(CONVERSION_ACTIONS);
 
+        Map<Long, Long> viewCounts = accessLogRepository.countEstablishmentViews().stream()
+            .collect(Collectors.toMap(AccessLogRepository.TargetCount::getTargetId, AccessLogRepository.TargetCount::getTotal));
+        Map<Long, Long> conversionCounts = accessLogRepository.countEstablishmentConversions(CONVERSION_ACTIONS).stream()
+            .collect(Collectors.toMap(AccessLogRepository.TargetCount::getTargetId, AccessLogRepository.TargetCount::getTotal));
         Map<String, Long> accessByEst = new HashMap<>();
         Map<String, Long> conversionByEst = new HashMap<>();
         establishmentRepository.findAll().forEach(est -> {
-            long views = accessLogRepository.countByTargetTypeAndTargetIdAndActionType("ESTABLISHMENT", est.getId(), "VIEW");
-            long conversions = accessLogRepository.countByTargetTypeAndTargetIdAndActionTypeIn("ESTABLISHMENT", est.getId(), CONVERSION_ACTIONS);
+            long views = viewCounts.getOrDefault(est.getId(), 0L);
+            long conversions = conversionCounts.getOrDefault(est.getId(), 0L);
 
             if (views > 0) {
                 accessByEst.put(est.getName(), views);
@@ -190,7 +197,7 @@ public class AnalyticsService {
         });
 
         Map<String, Long> funnel = new LinkedHashMap<>();
-        funnel.put("Visualizacoes", pageViews);
+        funnel.put("Visualizações", pageViews);
         funnel.put("Aberturas de detalhe", detailOpens);
         funnel.put("Salvos no roteiro", itineraryAdds);
         funnel.put("Cliques Google", googleClicks);
@@ -225,28 +232,34 @@ public class AnalyticsService {
         );
     }
 
-    public EstablishmentStatsDTO getEstablishmentStats(Long establishmentId) {
+    public EstablishmentStatsDTO getEstablishmentStats(Long establishmentId, Authentication authentication) {
+        assertCanReadEstablishmentStats(establishmentId, authentication);
         Establishment establishment = establishmentRepository.findById(establishmentId)
             .orElseThrow(() -> new RuntimeException("Estabelecimento não encontrado"));
 
-        long views = accessLogRepository.countByTargetTypeAndTargetIdAndActionType("ESTABLISHMENT", establishmentId, "VIEW");
-        long whatsappClicks = accessLogRepository.countByTargetTypeAndTargetIdAndActionType("ESTABLISHMENT", establishmentId, "WHATSAPP_CLICK");
-        long mapClicks = accessLogRepository.countByTargetTypeAndTargetIdAndActionType("ESTABLISHMENT", establishmentId, "MAP_CLICK")
-            + accessLogRepository.countByTargetTypeAndTargetIdAndActionType("ESTABLISHMENT", establishmentId, "DIRECTIONS_CLICK");
-        long bookingClicks = accessLogRepository.countByTargetTypeAndTargetIdAndActionType("ESTABLISHMENT", establishmentId, "BOOKING_CLICK");
-        long websiteClicks = accessLogRepository.countByTargetTypeAndTargetIdAndActionType("ESTABLISHMENT", establishmentId, "WEBSITE_CLICK")
-            + accessLogRepository.countByTargetTypeAndTargetIdAndActionType("ESTABLISHMENT", establishmentId, "MENU_CLICK");
-        long itineraryAdds = accessLogRepository.countByTargetTypeAndTargetIdAndActionType("ESTABLISHMENT", establishmentId, "ITINERARY_ADD");
+        Map<String, Long> actionCounts = accessLogRepository.countActionsByTarget("ESTABLISHMENT", establishmentId)
+            .stream()
+            .collect(Collectors.toMap(
+                entry -> normalizeActionType(entry.getActionType()),
+                AccessLogRepository.ActionCount::getTotal,
+                Long::sum
+            ));
+        long views = actionCount(actionCounts, "VIEW");
+        long whatsappClicks = actionCount(actionCounts, "WHATSAPP_CLICK");
+        long mapClicks = actionCount(actionCounts, "MAP_CLICK") + actionCount(actionCounts, "DIRECTIONS_CLICK");
+        long bookingClicks = actionCount(actionCounts, "BOOKING_CLICK");
+        long websiteClicks = actionCount(actionCounts, "WEBSITE_CLICK") + actionCount(actionCounts, "MENU_CLICK");
+        long itineraryAdds = actionCount(actionCounts, "ITINERARY_ADD");
 
         Map<String, Long> conversionsByAction = new LinkedHashMap<>();
         BUSINESS_ACTIONS.forEach(action -> {
-            long count = accessLogRepository.countByTargetTypeAndTargetIdAndActionType("ESTABLISHMENT", establishmentId, action);
+            long count = actionCount(actionCounts, action);
             if (count > 0) {
                 conversionsByAction.put(action, count);
             }
         });
 
-        long conversions = accessLogRepository.countByTargetTypeAndTargetIdAndActionTypeIn("ESTABLISHMENT", establishmentId, BUSINESS_ACTIONS);
+        long conversions = BUSINESS_ACTIONS.stream().mapToLong(action -> actionCount(actionCounts, action)).sum();
         double conversionRate = views > 0 ? (conversions * 100.0 / views) : 0.0;
 
         return new EstablishmentStatsDTO(
@@ -268,6 +281,18 @@ public class AnalyticsService {
         return logs.stream()
             .filter(log -> isAction(log, actionType))
             .count();
+    }
+
+    private long actionCount(Map<String, Long> counts, String actionType) {
+        return counts.getOrDefault(normalizeActionType(actionType), 0L);
+    }
+
+    private void assertCanReadEstablishmentStats(Long establishmentId, Authentication authentication) {
+        Long userId = resolveUserId(authentication);
+        User user = userId == null ? null : userRepository.findById(userId).orElse(null);
+        if (user == null || (user.getRole() != UserRole.ADMIN && !establishmentId.equals(user.getOwnedEstablishmentId()))) {
+            throw new RuntimeException("Acesso negado às métricas deste estabelecimento");
+        }
     }
 
     private long countActions(List<AccessLog> logs, Collection<String> actionTypes) {
@@ -538,6 +563,9 @@ public class AnalyticsService {
         }
 
         Object principal = authentication.getPrincipal();
+        if (principal instanceof AuthenticatedUserPrincipal user && user.id() != null) {
+            return user.id();
+        }
         if (principal instanceof br.gov.noronha.sistur.modules.auth.model.User user && user.getId() != null) {
             return user.getId();
         }
@@ -581,6 +609,19 @@ public class AnalyticsService {
         if (actionType == null || actionType.isBlank()) {
             return "VIEW";
         }
-        return actionType.trim().toUpperCase();
+        return normalizeText(actionType.trim().toUpperCase(Locale.ROOT), 64);
+    }
+
+    private String normalizeTargetType(String targetType) {
+        return normalizeText(targetType.trim().toUpperCase(Locale.ROOT), 64);
+    }
+
+    private String normalizeText(String value, int maxLength) {
+        if (value == null || value.isBlank()) {
+            return null;
+        }
+
+        String normalized = value.trim();
+        return normalized.length() > maxLength ? normalized.substring(0, maxLength) : normalized;
     }
 }

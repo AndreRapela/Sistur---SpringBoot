@@ -6,6 +6,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.web.SecurityFilterChain;
 
 import lombok.RequiredArgsConstructor;
@@ -20,6 +21,7 @@ import java.util.List;
 
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
 
@@ -35,11 +37,13 @@ public class SecurityConfig {
             .csrf(csrf -> csrf.disable())
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
+                .requestMatchers("/actuator/health", "/actuator/health/**").permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/auth/login", "/api/auth/google", "/api/auth/register").permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/analytics/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/weather/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/events/**", "/api/tours/**", "/api/establishments/**", "/api/tourist-points/**", "/api/itineraries/**").permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/routes/**").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/admin/stats/establishments/*").hasAnyRole("ADMIN", "CLIENT")
                 .requestMatchers("/api/admin/**").hasRole("ADMIN")
                 .requestMatchers("/api/client/**").hasAnyRole("ADMIN", "CLIENT")
                 .anyRequest().authenticated()

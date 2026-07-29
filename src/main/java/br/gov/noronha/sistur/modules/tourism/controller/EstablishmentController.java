@@ -7,6 +7,7 @@ import br.gov.noronha.sistur.dto.EstablishmentDTO;
 import br.gov.noronha.sistur.dto.ReviewDTO;
 import br.gov.noronha.sistur.modules.tourism.service.EstablishmentService;
 import lombok.RequiredArgsConstructor;
+import jakarta.validation.Valid;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
@@ -26,7 +27,10 @@ public class EstablishmentController {
     private final EstablishmentService establishmentService;
 
     @GetMapping
-    @Cacheable(value = "establishments", key = "#type + '-' + #category + '-' + #search + '-' + #pageable.pageNumber")
+    @Cacheable(
+        value = "establishments",
+        key = "'list-' + #type + '-' + #category + '-' + #search + '-' + #pageable.pageNumber + '-' + #pageable.pageSize + '-' + #pageable.sort"
+    )
     public ResponseEntity<ApiResponse<Page<EstablishmentDTO>>> getAllEstablishments(
             @RequestParam(required = false) EstablishmentType type,
             @RequestParam(required = false) String category,
@@ -57,20 +61,20 @@ public class EstablishmentController {
 
     @PostMapping
     @PreAuthorize("hasAnyRole('ADMIN', 'CLIENT')")
-    public ResponseEntity<ApiResponse<EstablishmentDTO>> create(@RequestBody EstablishmentDTO dto) {
-        return ResponseEntity.ok(ApiResponse.success(establishmentService.save(dto), "Estabelecimento cadastrado com sucesso"));
+    public ResponseEntity<ApiResponse<EstablishmentDTO>> create(@Valid @RequestBody EstablishmentDTO dto, Authentication authentication) {
+        return ResponseEntity.ok(ApiResponse.success(establishmentService.save(dto, authentication), "Estabelecimento cadastrado com sucesso"));
     }
 
     @PutMapping("/{id}")
     @PreAuthorize("hasAnyRole('ADMIN', 'CLIENT')")
     @CacheEvict(value = "establishments", allEntries = true)
-    public ResponseEntity<ApiResponse<EstablishmentDTO>> update(@PathVariable Long id, @RequestBody EstablishmentDTO dto) {
-        return ResponseEntity.ok(ApiResponse.success(establishmentService.update(id, dto), "Estabelecimento atualizado com sucesso"));
+    public ResponseEntity<ApiResponse<EstablishmentDTO>> update(@PathVariable Long id, @Valid @RequestBody EstablishmentDTO dto, Authentication authentication) {
+        return ResponseEntity.ok(ApiResponse.success(establishmentService.update(id, dto, authentication), "Estabelecimento atualizado com sucesso"));
     }
 
     @PostMapping("/{id}/reviews")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<ApiResponse<Void>> addReview(@PathVariable Long id, @RequestBody ReviewDTO reviewDto, Authentication authentication) {
+    public ResponseEntity<ApiResponse<Void>> addReview(@PathVariable Long id, @Valid @RequestBody ReviewDTO reviewDto, Authentication authentication) {
         establishmentService.addReview(id, reviewDto, authentication);
         return ResponseEntity.ok(ApiResponse.success(null, "Avaliação enviada"));
     }

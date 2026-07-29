@@ -6,6 +6,8 @@ import br.gov.noronha.sistur.modules.analytics.repository.AccessLogRepository;
 import br.gov.noronha.sistur.dto.EstablishmentDTO;
 import br.gov.noronha.sistur.dto.ReviewDTO;
 import br.gov.noronha.sistur.modules.auth.model.User;
+import br.gov.noronha.sistur.modules.auth.model.AuthenticatedUserPrincipal;
+import br.gov.noronha.sistur.modules.auth.model.UserRole;
 import br.gov.noronha.sistur.modules.auth.repository.UserRepository;
 import br.gov.noronha.sistur.modules.tourism.model.Establishment;
 import br.gov.noronha.sistur.modules.tourism.model.EstablishmentReview;
@@ -118,13 +120,24 @@ public class EstablishmentService {
 
     @Transactional
     @CacheEvict(value = "establishments", allEntries = true)
-    public EstablishmentDTO save(EstablishmentDTO dto) {
+    public EstablishmentDTO save(EstablishmentDTO dto, Authentication authentication) {
+        User owner = resolveRequiredUser(authentication);
+        if (owner.getRole() == UserRole.CLIENT && owner.getOwnedEstablishmentId() != null) {
+            throw new RuntimeException("Este parceiro já possui um estabelecimento cadastrado");
+        }
+
         Establishment e = fromDTO(dto);
-        return toDTO(establishmentRepository.save(e));
+        Establishment saved = establishmentRepository.save(e);
+        if (owner.getRole() == UserRole.CLIENT) {
+            owner.setOwnedEstablishmentId(saved.getId());
+            userRepository.save(owner);
+        }
+        return toDTO(saved);
     }
 
     @Transactional
-    public EstablishmentDTO update(Long id, EstablishmentDTO dto) {
+    public EstablishmentDTO update(Long id, EstablishmentDTO dto, Authentication authentication) {
+        assertCanManageEstablishment(id, authentication);
         Establishment e = establishmentRepository.findById(id)
             .orElseThrow(() -> new RuntimeException("Não encontrado"));
         updateFromDTO(e, dto);
@@ -255,6 +268,9 @@ public class EstablishmentService {
         }
 
         Object principal = authentication.getPrincipal();
+        if (principal instanceof AuthenticatedUserPrincipal user && user.id() != null) {
+            return user.id();
+        }
         if (principal instanceof br.gov.noronha.sistur.modules.auth.model.User user && user.getId() != null) {
             return user.getId();
         }
@@ -269,5 +285,17 @@ public class EstablishmentService {
         }
 
         return userId;
+    }
+
+    private User resolveRequiredUser(Authentication authentication) {
+        return userRepository.findById(resolveRequiredUserId(authentication))
+            .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+    }
+
+    private void assertCanManageEstablishment(Long establishmentId, Authentication authentication) {
+        User user = resolveRequiredUser(authentication);
+        if (user.getRole() != UserRole.ADMIN && !establishmentId.equals(user.getOwnedEstablishmentId())) {
+            throw new RuntimeException("Acesso negado a este estabelecimento");
+        }
     }
 }

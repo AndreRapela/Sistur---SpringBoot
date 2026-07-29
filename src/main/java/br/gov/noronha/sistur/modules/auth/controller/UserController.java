@@ -42,10 +42,6 @@ public class UserController {
         user.setName(data.name());
         user.setBio(data.bio());
         user.setPhotoUrl(data.photoUrl());
-        if (data.ownedEstablishmentId() != null) {
-            user.setOwnedEstablishmentId(data.ownedEstablishmentId());
-        }
-        
         User updated = userRepository.save(user);
         
         UserDTO response = new UserDTO(
