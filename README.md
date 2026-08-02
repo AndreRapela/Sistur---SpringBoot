@@ -5,7 +5,7 @@ API Spring Boot do SisTur para turismo em Fernando de Noronha.
 ## Requisitos
 
 - JDK 21
-- Maven 3.9+ ou Docker
+- Maven Wrapper incluído ou Docker
 - Banco Postgres/Supabase ativo
 
 ## Variaveis obrigatorias
@@ -19,6 +19,8 @@ SPRING_DATASOURCE_PASSWORD=<senha>
 JWT_SECRET=<segredo-forte-com-minimo-32-caracteres>
 GOOGLE_CLIENT_ID=<client-id-google>
 CORS_ALLOWED_ORIGINS=https://<dominio-do-frontend>
+ANALYTICS_PRIVACY_SALT=<segredo-diferente-do-jwt>
+SWAGGER_ENABLED=false
 ```
 
 Essa conexao direta e a melhor opcao para um backend persistente quando o
@@ -66,11 +68,11 @@ SISTUR_SEED_ENABLED=false
 
 ## Execucao
 
-```bash
-mvn spring-boot:run
+```powershell
+.\mvnw.cmd spring-boot:run
 ```
 
-Swagger:
+Swagger local, quando `SWAGGER_ENABLED=true`:
 
 ```text
 http://localhost:8080/swagger-ui/index.html
@@ -101,7 +103,7 @@ incorreta produz erro de autenticacao, nao timeout de socket.
 
 ## Observacoes de lancamento
 
-- Use JDK 21 no IntelliJ. O projeto compila com `release 21`; JDK 26 pode quebrar processadores de anotacao.
+- Use JDK 21 no `Project SDK` e no `Maven Runner` do IntelliJ. O build interrompe cedo em outro JDK para evitar falhas obscuras do Lombok/Mockito.
 - Nao deixe senha de banco ou `JWT_SECRET` versionados.
 - Para Supabase, prefira URL com SSL habilitado.
 - Configure `CORS_ALLOWED_ORIGINS` com o dominio real do frontend em producao.

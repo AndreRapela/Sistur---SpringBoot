@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/ai")
@@ -32,7 +33,7 @@ public class AIController {
     @PostMapping("/optimize")
     @Operation(summary = "Otimizar roteiro com base nas paradas", 
                description = "Ordena itens do roteiro por horário, proximidade e contexto da viagem.")
-    public ResponseEntity<RouteOptimizationResponseDTO> optimizeRoute(@RequestBody RouteOptimizationRequestDTO request) {
+    public ResponseEntity<RouteOptimizationResponseDTO> optimizeRoute(@Valid @RequestBody RouteOptimizationRequestDTO request) {
         return ResponseEntity.ok(aiService.optimizeRoute(request));
     }
 }

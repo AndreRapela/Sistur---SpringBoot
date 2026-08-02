@@ -15,6 +15,10 @@ import br.gov.noronha.sistur.modules.tourism.model.EstablishmentType;
 import br.gov.noronha.sistur.modules.tourism.repository.EstablishmentRepository;
 import br.gov.noronha.sistur.modules.tourism.repository.EstablishmentReviewRepository;
 import br.gov.noronha.sistur.repository.specification.EstablishmentSpecifications;
+import br.gov.noronha.sistur.exception.ConflictException;
+import br.gov.noronha.sistur.exception.ForbiddenOperationException;
+import br.gov.noronha.sistur.exception.ResourceNotFoundException;
+import br.gov.noronha.sistur.exception.UnauthenticatedException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.data.domain.Page;
@@ -71,7 +75,7 @@ public class EstablishmentService {
 
     public EstablishmentDTO findById(Long id, Authentication authentication) {
         Establishment establishment = establishmentRepository.findById(id)
-            .orElseThrow(() -> new RuntimeException("Estabelecimento não encontrado"));
+            .orElseThrow(() -> new ResourceNotFoundException("Estabelecimento não encontrado."));
         
         // Log access
         accessLogRepository.save(AccessLog.builder()
@@ -89,19 +93,21 @@ public class EstablishmentService {
     @CacheEvict(value = "establishments", allEntries = true)
     public void addReview(Long establishmentId, ReviewDTO reviewDTO, Authentication authentication) {
         Establishment est = establishmentRepository.findById(establishmentId)
-            .orElseThrow(() -> new RuntimeException("Not found"));
+            .orElseThrow(() -> new ResourceNotFoundException("Estabelecimento não encontrado."));
 
         Long userId = resolveRequiredUserId(authentication);
         User user = userRepository.findById(userId)
-            .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+            .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado."));
         
-        EstablishmentReview review = EstablishmentReview.builder()
-            .establishment(est)
-            .user(user)
-            .rating(reviewDTO.getRating())
-            .comment(reviewDTO.getComment())
-            .createdAt(LocalDateTime.now())
-            .build();
+        EstablishmentReview review = reviewRepository.findByEstablishmentIdAndUserId(establishmentId, userId)
+            .orElseGet(() -> EstablishmentReview.builder()
+                .establishment(est)
+                .user(user)
+                .createdAt(LocalDateTime.now())
+                .build());
+        review.setRating(reviewDTO.getRating());
+        review.setComment(reviewDTO.getComment() == null ? null : reviewDTO.getComment().trim());
+        review.setCreatedAt(LocalDateTime.now());
         
         reviewRepository.save(review);
         
@@ -113,7 +119,7 @@ public class EstablishmentService {
 
     @Transactional(readOnly = true)
     public List<ReviewDTO> getReviews(Long establishmentId) {
-        return reviewRepository.findByEstablishmentIdOrderByCreatedAtDesc(establishmentId)
+        return reviewRepository.findByEstablishmentIdOrderByCreatedAtDesc(establishmentId, PageRequest.of(0, 50))
             .stream().map(r -> new ReviewDTO(r.getId(), establishmentId, r.getUser() != null ? r.getUser().getName() : "Usuário", r.getRating(), r.getComment(), r.getCreatedAt()))
             .collect(Collectors.toList());
     }
@@ -123,7 +129,7 @@ public class EstablishmentService {
     public EstablishmentDTO save(EstablishmentDTO dto, Authentication authentication) {
         User owner = resolveRequiredUser(authentication);
         if (owner.getRole() == UserRole.CLIENT && owner.getOwnedEstablishmentId() != null) {
-            throw new RuntimeException("Este parceiro já possui um estabelecimento cadastrado");
+            throw new ConflictException("Este parceiro já possui um estabelecimento cadastrado.");
         }
 
         Establishment e = fromDTO(dto);
@@ -139,7 +145,7 @@ public class EstablishmentService {
     public EstablishmentDTO update(Long id, EstablishmentDTO dto, Authentication authentication) {
         assertCanManageEstablishment(id, authentication);
         Establishment e = establishmentRepository.findById(id)
-            .orElseThrow(() -> new RuntimeException("Não encontrado"));
+            .orElseThrow(() -> new ResourceNotFoundException("Estabelecimento não encontrado."));
         updateFromDTO(e, dto);
         return toDTO(establishmentRepository.save(e));
     }
@@ -281,7 +287,7 @@ public class EstablishmentService {
     private Long resolveRequiredUserId(Authentication authentication) {
         Long userId = resolveUserId(authentication);
         if (userId == null) {
-            throw new RuntimeException("Usuário não autenticado");
+            throw new UnauthenticatedException("Faça login para continuar.");
         }
 
         return userId;
@@ -289,13 +295,13 @@ public class EstablishmentService {
 
     private User resolveRequiredUser(Authentication authentication) {
         return userRepository.findById(resolveRequiredUserId(authentication))
-            .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+            .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado."));
     }
 
     private void assertCanManageEstablishment(Long establishmentId, Authentication authentication) {
         User user = resolveRequiredUser(authentication);
         if (user.getRole() != UserRole.ADMIN && !establishmentId.equals(user.getOwnedEstablishmentId())) {
-            throw new RuntimeException("Acesso negado a este estabelecimento");
+            throw new ForbiddenOperationException("Acesso negado a este estabelecimento.");
         }
     }
 }

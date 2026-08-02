@@ -19,9 +19,11 @@ import br.gov.noronha.sistur.modules.auth.repository.UserRepository;
 import br.gov.noronha.sistur.modules.auth.model.AuthenticatedUserPrincipal;
 import br.gov.noronha.sistur.modules.auth.model.User;
 import br.gov.noronha.sistur.modules.auth.model.UserRole;
+import br.gov.noronha.sistur.exception.ForbiddenOperationException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.security.core.Authentication;
+import org.springframework.beans.factory.annotation.Value;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -37,10 +39,18 @@ import java.util.Locale;
 import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import java.net.URI;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.HexFormat;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Service
 @RequiredArgsConstructor
 public class AnalyticsService {
+    private static final Pattern SAFE_QUERY_PARAMETER = Pattern.compile("(?:^|&)(category|type)=([A-Za-z0-9_%.-]{1,64})", Pattern.CASE_INSENSITIVE);
 
     private static final List<String> CONVERSION_ACTIONS = List.of(
         "WHATSAPP_CLICK",
@@ -103,6 +113,9 @@ public class AnalyticsService {
     private final TouristPointRepository touristPointRepository;
     private final EventRepository eventRepository;
 
+    @Value("${analytics.privacy-salt}")
+    private String analyticsPrivacySalt;
+
     public void recordEvent(TrackEventRequest request, Authentication authentication, String ipAddress) {
         if (request == null || request.targetType() == null || request.targetType().isBlank()) {
             return;
@@ -114,9 +127,9 @@ public class AnalyticsService {
             .targetId(resolveTargetId(request.targetId()))
             .targetLabel(normalizeLabel(request.targetLabel()))
             .actionType(normalizeActionType(request.actionType()))
-            .pagePath(normalizeText(request.pagePath(), 512))
-            .referrer(normalizeText(request.referrer(), 1024))
-            .ipAddress(normalizeText(ipAddress, 64))
+            .pagePath(sanitizePagePath(request.pagePath()))
+            .referrer(sanitizeReferrer(request.referrer()))
+            .ipAddress(pseudonymizeIp(ipAddress))
             .timestamp(LocalDateTime.now())
             .build());
     }
@@ -291,7 +304,7 @@ public class AnalyticsService {
         Long userId = resolveUserId(authentication);
         User user = userId == null ? null : userRepository.findById(userId).orElse(null);
         if (user == null || (user.getRole() != UserRole.ADMIN && !establishmentId.equals(user.getOwnedEstablishmentId()))) {
-            throw new RuntimeException("Acesso negado às métricas deste estabelecimento");
+            throw new ForbiddenOperationException("Acesso negado às métricas deste estabelecimento.");
         }
     }
 
@@ -623,5 +636,60 @@ public class AnalyticsService {
 
         String normalized = value.trim();
         return normalized.length() > maxLength ? normalized.substring(0, maxLength) : normalized;
+    }
+
+    private String sanitizePagePath(String value) {
+        if (value == null || value.isBlank()) {
+            return null;
+        }
+
+        try {
+            URI uri = URI.create(value.trim());
+            String path = normalizeText(uri.getPath(), 400);
+            String query = uri.getRawQuery();
+            if (query == null || query.isBlank()) {
+                return path;
+            }
+
+            List<String> safeParameters = new ArrayList<>();
+            Matcher matcher = SAFE_QUERY_PARAMETER.matcher(query);
+            while (matcher.find()) {
+                safeParameters.add(matcher.group(1).toLowerCase(Locale.ROOT) + "=" + matcher.group(2));
+            }
+            return safeParameters.isEmpty() ? path : normalizeText(path + "?" + String.join("&", safeParameters), 512);
+        } catch (IllegalArgumentException exception) {
+            return null;
+        }
+    }
+
+    private String sanitizeReferrer(String value) {
+        if (value == null || value.isBlank()) {
+            return null;
+        }
+
+        try {
+            URI uri = URI.create(value.trim());
+            if (uri.getScheme() == null || uri.getHost() == null) {
+                return null;
+            }
+            return normalizeText(uri.getScheme() + "://" + uri.getHost() + (uri.getPath() == null ? "" : uri.getPath()), 1024);
+        } catch (IllegalArgumentException exception) {
+            return null;
+        }
+    }
+
+    private String pseudonymizeIp(String ipAddress) {
+        if (ipAddress == null || ipAddress.isBlank()) {
+            return null;
+        }
+
+        try {
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            String source = analyticsPrivacySalt + ":" + ipAddress.trim();
+            byte[] hash = digest.digest(source.getBytes(StandardCharsets.UTF_8));
+            return HexFormat.of().formatHex(hash, 0, 16);
+        } catch (NoSuchAlgorithmException exception) {
+            throw new IllegalStateException("SHA-256 indisponível", exception);
+        }
     }
 }

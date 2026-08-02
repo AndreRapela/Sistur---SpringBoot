@@ -19,7 +19,9 @@ import br.gov.noronha.sistur.modules.tourism.repository.TouristPointRepository;
 import br.gov.noronha.sistur.modules.tourism.repository.TourRepository;
 import br.gov.noronha.sistur.modules.tourism.service.RouteService;
 import br.gov.noronha.sistur.modules.tourism.service.EstablishmentService;
+import br.gov.noronha.sistur.modules.weather.service.WeatherGatewayService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -35,12 +37,12 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.List;
-import java.util.Random;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class AIService {
 
     private final EstablishmentService establishmentService;
@@ -49,21 +51,19 @@ public class AIService {
     private final TourRepository tourRepository;
     private final EstablishmentRepository establishmentRepository;
     private final TouristPointRepository touristPointRepository;
+    private final WeatherGatewayService weatherGatewayService;
 
-    /**
-     * Motor de Recomendação Inteligente (Simulação de IA + Lógica de Contexto)
-     * No futuro, integra com OpenAI/LangChain4j ou Spring AI.
-     */
+    /** Motor de recomendação baseado em contexto, horário e previsão atual da ilha. */
     public RecommendationResponseDTO getSmartRecommendation() {
         LocalTime now = LocalTime.now();
-        String weather = simulateWeather();
+        String weather = currentWeatherCondition();
         
         // Regras de Contexto (Elite Performance Strategy)
         String type;
         String summary;
         String reasoning;
 
-        if (weather.equals("RAINY")) {
+        if (weather.equals("RAINY") || weather.equals("STORM")) {
             type = "RAINY_DAY";
             summary = "Parece que vai chover em Noronha hoje!";
             reasoning = "Priorizamos locais cobertos, gastronomia interna e experiências culturais para garantir seu conforto.";
@@ -147,20 +147,34 @@ public class AIService {
     }
 
     private List<EstablishmentDTO> getFilteredSuggestions(String type) {
-        // Busca todos e filtra localmente (simulando score de IA)
+        // Heuristica deterministica usada quando nao ha um modelo externo configurado.
         return establishmentService.findAll(0, 50).getContent().stream()
                 .filter(e -> {
                     if (type.equals("RAINY_DAY")) return e.type().toString().equals("RESTAURANT");
-                    if (type.equals("EVENING")) return e.averagePrice().doubleValue() > 80; // Noite premium
+                    if (type.equals("EVENING")) return e.averagePrice() != null && e.averagePrice().doubleValue() > 80;
                     return true;
                 })
-                .limit(3) // Top 3 recomendações "IA"
+                .limit(3)
                 .collect(Collectors.toList());
     }
 
-    private String simulateWeather() {
-        // Simula uma API de clima (80% sol, 20% chuva em Noronha)
-        return new Random().nextInt(10) > 8 ? "RAINY" : "SUNNY";
+    private String currentWeatherCondition() {
+        try {
+            int weatherCode = weatherGatewayService.getNoronhaWeather()
+                .forecast()
+                .path("current")
+                .path("weather_code")
+                .asInt(-1);
+
+            if (weatherCode == 0 || weatherCode == 1) return "SUNNY";
+            if (weatherCode >= 95) return "STORM";
+            if (weatherCode >= 51) return "RAINY";
+            if (weatherCode >= 2) return "CLOUDY";
+            return "UNKNOWN";
+        } catch (RuntimeException exception) {
+            log.warn("Clima indisponível para recomendação contextual: {}", exception.getClass().getSimpleName());
+            return "UNKNOWN";
+        }
     }
 
     private TripContext resolveTripContext(RouteOptimizationRequestDTO request, List<ResolvedRouteItem> items) {

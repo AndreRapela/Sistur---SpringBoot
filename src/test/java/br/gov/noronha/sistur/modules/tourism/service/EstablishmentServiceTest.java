@@ -71,7 +71,7 @@ class EstablishmentServiceTest {
             () -> service.update(7L, mock(EstablishmentDTO.class), authentication)
         );
 
-        assertEquals("Acesso negado a este estabelecimento", error.getMessage());
+        assertEquals("Acesso negado a este estabelecimento.", error.getMessage());
         verify(establishmentRepository, never()).findById(any());
     }
 

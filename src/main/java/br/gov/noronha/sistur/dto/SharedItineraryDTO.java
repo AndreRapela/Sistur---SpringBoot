@@ -8,6 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
+import java.time.LocalDateTime;
 import java.util.stream.Collectors;
 
 @Data
@@ -17,6 +18,9 @@ import java.util.stream.Collectors;
 public class SharedItineraryDTO {
     private Long id;
     private String name;
+    private boolean isPublic;
+    private String shareToken;
+    private LocalDateTime createdAt;
     private int viewCount;
     private SharedUserDTO user;
     private List<SharedItineraryItemDTO> items;
@@ -37,6 +41,9 @@ public class SharedItineraryDTO {
         return SharedItineraryDTO.builder()
                 .id(itinerary.getId())
                 .name(itinerary.getName())
+                .isPublic(itinerary.isPublic())
+                .shareToken(itinerary.getShareToken())
+                .createdAt(itinerary.getCreatedAt())
                 .viewCount(itinerary.getViews())
                 .user(user == null ? null : SharedUserDTO.builder()
                         .id(user.getId())

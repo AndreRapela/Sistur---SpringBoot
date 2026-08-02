@@ -1,13 +1,27 @@
 package br.gov.noronha.sistur.modules.social.controller;
 
 import br.gov.noronha.sistur.dto.ApiResponse;
+import br.gov.noronha.sistur.dto.ItineraryCommentDTO;
+import br.gov.noronha.sistur.dto.ItineraryCommentRequest;
+import br.gov.noronha.sistur.dto.ItineraryFeedDTO;
+import br.gov.noronha.sistur.dto.ItinerarySaveRequest;
 import br.gov.noronha.sistur.dto.SharedItineraryDTO;
-import br.gov.noronha.sistur.modules.social.model.Itinerary;
 import br.gov.noronha.sistur.modules.social.service.ItineraryService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
 import java.util.List;
 
 @RestController
@@ -18,23 +32,21 @@ public class ItineraryController {
     private final ItineraryService itineraryService;
 
     @GetMapping("/my")
-    public ResponseEntity<ApiResponse<List<Itinerary>>> getMyItineraries(Authentication authentication) {
-        List<Itinerary> itineraries = itineraryService.getMyItineraries(authentication.getName());
-        return ResponseEntity.ok(ApiResponse.success(itineraries, "Roteiros carregados"));
+    public ResponseEntity<ApiResponse<List<SharedItineraryDTO>>> getMyItineraries(Authentication authentication) {
+        return ResponseEntity.ok(ApiResponse.success(
+            itineraryService.getMyItineraries(authentication.getName()),
+            "Roteiros carregados"
+        ));
     }
 
-    @org.springframework.cache.annotation.Cacheable("public_itineraries")
     @GetMapping("/public")
-    public ResponseEntity<ApiResponse<List<Itinerary>>> getPublicItineraries() {
-        List<Itinerary> itineraries = itineraryService.getPublicItineraries();
-        return ResponseEntity.ok(ApiResponse.success(itineraries, "Feed social carregado"));
+    public ResponseEntity<ApiResponse<List<SharedItineraryDTO>>> getPublicItineraries() {
+        return ResponseEntity.ok(ApiResponse.success(itineraryService.getPublicItineraries(), "Roteiros públicos carregados"));
     }
 
     @GetMapping("/feed")
-    public ResponseEntity<ApiResponse<org.springframework.data.domain.Page<br.gov.noronha.sistur.dto.ItineraryFeedDTO>>> getFeed(
-            org.springframework.data.domain.Pageable pageable) {
-        Authentication authentication = org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication();
-        String email = (authentication != null && !"anonymousUser".equals(authentication.getName())) ? authentication.getName() : null;
+    public ResponseEntity<ApiResponse<Page<ItineraryFeedDTO>>> getFeed(Pageable pageable, Authentication authentication) {
+        String email = authentication == null ? null : authentication.getName();
         return ResponseEntity.ok(ApiResponse.success(itineraryService.getFeed(pageable, email), "Feed carregado"));
     }
 
@@ -45,33 +57,43 @@ public class ItineraryController {
     }
 
     @PostMapping("/{id}/comments")
-    public ResponseEntity<ApiResponse<br.gov.noronha.sistur.dto.ItineraryCommentDTO>> addComment(
-            @PathVariable Long id, @RequestBody java.util.Map<String, String> payload, Authentication authentication) {
-        br.gov.noronha.sistur.modules.social.model.ItineraryComment comment = itineraryService.addComment(id, authentication.getName(), payload.get("content"));
-        return ResponseEntity.ok(ApiResponse.success(
-                br.gov.noronha.sistur.dto.ItineraryCommentDTO.fromEntity(comment),
-                "Comentário salvo"
+    public ResponseEntity<ApiResponse<ItineraryCommentDTO>> addComment(
+        @PathVariable Long id,
+        @Valid @RequestBody ItineraryCommentRequest request,
+        Authentication authentication
+    ) {
+        ItineraryCommentDTO comment = itineraryService.addComment(id, authentication.getName(), request.content());
+        return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success(
+            comment,
+            "Comentário salvo"
         ));
     }
 
     @GetMapping("/{id}/comments")
-    public ResponseEntity<ApiResponse<List<br.gov.noronha.sistur.dto.ItineraryCommentDTO>>> getComments(@PathVariable Long id) {
-        List<br.gov.noronha.sistur.dto.ItineraryCommentDTO> comments = itineraryService.getComments(id).stream()
-                .map(br.gov.noronha.sistur.dto.ItineraryCommentDTO::fromEntity)
-                .collect(java.util.stream.Collectors.toList());
-        return ResponseEntity.ok(ApiResponse.success(comments, "Comentários carregados"));
+    public ResponseEntity<ApiResponse<List<ItineraryCommentDTO>>> getComments(@PathVariable Long id) {
+        return ResponseEntity.ok(ApiResponse.success(
+            itineraryService.getComments(id),
+            "Comentários carregados"
+        ));
     }
 
     @GetMapping("/share/{token}")
     public ResponseEntity<ApiResponse<SharedItineraryDTO>> getSharedItinerary(@PathVariable String token) {
-        SharedItineraryDTO itinerary = itineraryService.getSharedItinerary(token);
-        return ResponseEntity.ok(ApiResponse.success(itinerary, "Roteiro compartilhado carregado"));
+        return ResponseEntity.ok(ApiResponse.success(
+            itineraryService.getSharedItinerary(token),
+            "Roteiro compartilhado carregado"
+        ));
     }
 
     @PostMapping
-    public ResponseEntity<ApiResponse<Itinerary>> save(@RequestBody Itinerary itinerary, Authentication authentication) {
-        Itinerary saved = itineraryService.save(itinerary, authentication.getName());
-        return ResponseEntity.ok(ApiResponse.success(saved, "Roteiro salvo com sucesso"));
+    public ResponseEntity<ApiResponse<SharedItineraryDTO>> save(
+        @Valid @RequestBody ItinerarySaveRequest request,
+        Authentication authentication
+    ) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success(
+            itineraryService.save(request, authentication.getName()),
+            "Roteiro salvo com sucesso"
+        ));
     }
 
     @DeleteMapping("/{id}")

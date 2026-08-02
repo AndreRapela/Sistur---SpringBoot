@@ -6,7 +6,9 @@ import lombok.*;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "itinerary_likes", indexes = {
+@Table(name = "itinerary_likes", uniqueConstraints = {
+    @UniqueConstraint(name = "uk_itinerary_likes_itinerary_user", columnNames = {"itinerary_id", "user_id"})
+}, indexes = {
     @Index(name = "idx_itinerary_likes_itinerary_id", columnList = "itinerary_id"),
     @Index(name = "idx_itinerary_likes_user_id", columnList = "user_id"),
     @Index(name = "idx_itinerary_likes_itinerary_user", columnList = "itinerary_id,user_id")

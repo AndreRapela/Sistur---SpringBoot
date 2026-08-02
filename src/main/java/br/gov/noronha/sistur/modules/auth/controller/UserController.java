@@ -1,59 +1,41 @@
 package br.gov.noronha.sistur.modules.auth.controller;
 
 import br.gov.noronha.sistur.dto.ApiResponse;
+import br.gov.noronha.sistur.dto.ProfileUpdateRequest;
 import br.gov.noronha.sistur.dto.UserDTO;
-import br.gov.noronha.sistur.modules.auth.model.User;
-import br.gov.noronha.sistur.modules.auth.repository.UserRepository;
+import br.gov.noronha.sistur.modules.auth.service.UserService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/users")
 @RequiredArgsConstructor
 public class UserController {
-
-    private final UserRepository userRepository;
+    private final UserService userService;
 
     @GetMapping("/profile")
     public ResponseEntity<ApiResponse<UserDTO>> getProfile(Authentication authentication) {
-        User user = userRepository.findByEmail(authentication.getName())
-                .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
-        
-        UserDTO dto = new UserDTO(
-            user.getId(),
-            user.getName(),
-            user.getEmail(),
-            user.getPhotoUrl(),
-            user.getBio(),
-            user.getRole(),
-            user.getOwnedEstablishmentId()
-        );
-        
-        return ResponseEntity.ok(ApiResponse.success(dto, "Perfil carregado"));
+        return ResponseEntity.ok(ApiResponse.success(
+            userService.getProfile(authentication.getName()),
+            "Perfil carregado"
+        ));
     }
 
     @PutMapping("/profile")
-    public ResponseEntity<ApiResponse<UserDTO>> updateProfile(@RequestBody UserDTO data, Authentication authentication) {
-        User user = userRepository.findByEmail(authentication.getName())
-                .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
-        
-        user.setName(data.name());
-        user.setBio(data.bio());
-        user.setPhotoUrl(data.photoUrl());
-        User updated = userRepository.save(user);
-        
-        UserDTO response = new UserDTO(
-            updated.getId(),
-            updated.getName(),
-            updated.getEmail(),
-            updated.getPhotoUrl(),
-            updated.getBio(),
-            updated.getRole(),
-            updated.getOwnedEstablishmentId()
-        );
-        
-        return ResponseEntity.ok(ApiResponse.success(response, "Perfil atualizado com sucesso"));
+    public ResponseEntity<ApiResponse<UserDTO>> updateProfile(
+        @Valid @RequestBody ProfileUpdateRequest request,
+        Authentication authentication
+    ) {
+        return ResponseEntity.ok(ApiResponse.success(
+            userService.updateProfile(authentication.getName(), request),
+            "Perfil atualizado com sucesso"
+        ));
     }
 }

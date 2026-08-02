@@ -77,7 +77,7 @@ class AnalyticsServiceTest {
             () -> service.getEstablishmentStats(7L, authentication(owner))
         );
 
-        assertEquals("Acesso negado às métricas deste estabelecimento", error.getMessage());
+        assertEquals("Acesso negado às métricas deste estabelecimento.", error.getMessage());
         verify(establishmentRepository, never()).findById(7L);
         verify(accessLogRepository, never()).countActionsByTarget("ESTABLISHMENT", 7L);
     }

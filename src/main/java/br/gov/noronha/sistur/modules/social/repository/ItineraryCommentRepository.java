@@ -12,7 +12,7 @@ import java.util.List;
 
 @Repository
 public interface ItineraryCommentRepository extends JpaRepository<ItineraryComment, Long> {
-    List<ItineraryComment> findByItineraryIdOrderByCreatedAtDesc(Long itineraryId);
+    List<ItineraryComment> findTop50ByItineraryIdOrderByCreatedAtDesc(Long itineraryId);
     long countByItineraryId(Long itineraryId);
 
     @Query("select c.itinerary.id as itineraryId, count(c) as total from ItineraryComment c where c.itinerary.id in :itineraryIds group by c.itinerary.id")
